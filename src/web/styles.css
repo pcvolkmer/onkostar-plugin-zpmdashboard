@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #1c60ab;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  @apply font-sans text-gray-800;
+  position: relative;
+  min-height: 100vh;
+}
+
+h1 {
+  @apply text-3xl font-bold my-4;
+}
+
+h2 {
+  @apply text-2xl font-bold my-4;
+}
+
+h3 {
+  @apply text-xl font-bold my-3;
+}
+
+nav {
+  @apply mb-4;
+  border-bottom: 1px solid var(--color-gray-300);
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+nav div.header {
+  @apply text-white font-bold;
+  background-image: linear-gradient(to top, #0f60a9 0%, var(--color-primary) 100%);
+  height: 40px;
+  padding-left: 15px;
+  align-content: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+nav div.breadcrumb {
+  @apply bg-gray-200 text-sm px-4 py-1;
+}
+
+nav div.breadcrumb a {
+  @apply text-gray-600;
+}
+
+nav div.breadcrumb a:hover {
+  @apply text-orange-400;
+}
+
+main.main-content {
+  @apply container mx-auto;
+}
+
+.statistics {
+  @apply p-1 bg-gray-100 mb-4 rounded drop-shadow-gray-400 drop-shadow-sm;
+}
+
+.statistics > ul {
+  @apply grid grid-cols-3 gap-4;
+}
+
+.statistics > ul > li {
+  @apply p-2 rounded shadow text-white text-center flex flex-col justify-center;
+  background-color: var(--color-primary);
+}
+
+.statistics > ul > li span {
+  @apply p-1 inline-block;
+}
+
+.statistics > ul > li .value {
+  @apply font-bold text-4xl;
+}

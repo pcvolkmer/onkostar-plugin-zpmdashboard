@@ -1,0 +1,52 @@
+<div class="dashboard-entry">
+    @if (data().anmeldedatum) {
+        <div class="case-id">
+            <div>PID: <b>{{ data().pid }}</b></div>
+            <div><b>{{ data().icd }}</b></div>
+            <div>
+                <a class="button" href="/onkostar/index.html?patientId={{ data().guid }}" target="_blank">Zum Patienten in Onkostar</a>
+            </div>
+        </div>
+        <div [class.success]="data().anmeldedatum">
+            <div class="name">Anmeldedatum MTB</div>
+            <div>{{ data().anmeldedatum | date:'dd.MM.yyyy' }}</div>
+        </div>
+        <div [class.success]="data().consentdatum">
+            <div class="name">MolPath-Consent</div>
+            @if (data().consentdatum) {
+                <div>{{ data().consentdatum | date:'dd.MM.yyyy' }}</div>
+            } @else {
+                <div>Nicht vorhanden</div>
+            }
+        </div>
+        <div [class.success]="data().empfehlungsdatum">
+            <div class="name">MTB Empfehlung</div>
+            @if (data().empfehlungsdatum) {
+                <div>{{ data().empfehlungsdatum | date:'dd.MM.yyyy' }}</div>
+            } @else {
+                <div>Kein MTB mit Empfehlung</div>
+            }
+        </div>
+        <div class="latest-doku">
+            <div class="name">Stand Dokumentation</div>
+            @if (data().latestDokuDatum) {
+                <div>{{ data().latestDokuDatum | date:'dd.MM.yyyy' }}</div>
+            } @else {
+                <div>Keine Angabe</div>
+            }
+        </div>
+        <div [class.success]="data().einschlussMvh" class="mvh-case">
+            <div class="name">MTB Empfehlung</div>
+            @if (data().einschlussMvh) {
+                <div>In MV §64e eingeschlossen</div>
+            } @else {
+                <div>Kein Einschluss MV §64e</div>
+            }
+        </div>
+    } @else {
+        <div class="loading">
+            <div class="spinner"></div>
+            <div>Lade Daten ...</div>
+        </div>
+    }
+</div>

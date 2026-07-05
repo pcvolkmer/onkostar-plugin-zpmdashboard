@@ -1,0 +1,54 @@
+<main class="main-content">
+    <h2>
+        <span>Statistiken</span>
+        &nbsp;
+        <select (change)="onYearChange($event)">
+            @for (year of years(); track year) {
+                <option value="{{year}}">{{year}}</option>
+            }
+        </select>
+    </h2>
+    <div class="statistics">
+        <h3>Kennzahlen {{ year() }}</h3>
+        <ul>
+            <li>
+                <span class="name">Anmeldungen</span>
+                <span class="value">{{statistics().anmeldungen}}</span>
+            </li>
+            <li>
+                <span class="name">Consents</span>
+                <span class="value">{{statistics().consents}}</span>
+            </li>
+            <li>
+                <span class="name">Empfehlungen</span>
+                <span class="value">{{statistics().empfehlungen}}</span>
+            </li>
+        </ul>
+        <h3>Primärfälle der letzten drei Jahre</h3>
+        <ul>
+            @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
+                <li>
+                    <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
+                    <span class="value">{{primaerfall.count}}</span>
+                </li>
+            }
+        </ul>
+    </div>
+    <h2>Primärfälle</h2>
+    <div>
+        @if (cases().length === 0) {
+            <p>Keine Primärfälle gefunden.</p>
+        } @else {
+            <ul>
+                @for (caseId of cases(); track caseId) {
+                    <li>
+                        <app-dashboard-entry [guid]="caseId.guid">
+                            <div class="dashboard-entry">Lade Daten ...</div>
+                        </app-dashboard-entry>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</main>
+<router-outlet/>

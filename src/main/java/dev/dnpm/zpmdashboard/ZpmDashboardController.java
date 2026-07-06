@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @RestController
@@ -50,10 +52,11 @@ public class ZpmDashboardController {
 
     @GetMapping("/zpm-dashboard/statistics")
     public ResponseEntity<Statistics> getStatistics(@RequestParam int year) {
+        final var currentYear = LocalDate.now(TimeZone.getDefault().toZoneId()).getYear();
         final var pf = List.of(
-                new Primaerfaelle(year - 2, this.zpmDashboardService.findPrimaerfaelle(year - 2).size()),
-                new Primaerfaelle(year - 1, this.zpmDashboardService.findPrimaerfaelle(year - 1).size()),
-                new Primaerfaelle(year, this.zpmDashboardService.findPrimaerfaelle(year).size())
+                new Primaerfaelle(currentYear - 2, this.zpmDashboardService.findPrimaerfaelle(currentYear - 2).size()),
+                new Primaerfaelle(currentYear - 1, this.zpmDashboardService.findPrimaerfaelle(currentYear - 1).size()),
+                new Primaerfaelle(currentYear, this.zpmDashboardService.findPrimaerfaelle(currentYear).size())
         );
 
         final var statistics = new Statistics(

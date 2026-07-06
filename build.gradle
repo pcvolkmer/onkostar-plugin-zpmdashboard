@@ -1,5 +1,8 @@
 plugins {
     id 'java-library'
+    id("com.gradleup.shadow") version "9.0.2"
+    id 'org.jetbrains.kotlin.jvm' version '2.4.0'
+    id "org.jetbrains.kotlin.plugin.spring" version '2.4.0'
 }
 
 group = 'dev.dnpm'
@@ -7,6 +10,12 @@ version = '0.1.0'
 description = 'ZPM Dashbord UKGM'
 
 java.sourceCompatibility = JavaVersion.VERSION_11
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -23,25 +32,44 @@ ext {
 }
 
 dependencies {
-    implementation files("./libs/onkostar-api-${onkostarVersion}.jar")
+    compileOnly files("./libs/onkostar-api-${onkostarVersion}.jar")
 
-    implementation "org.springframework:spring-beans:${springVersion}"
-    implementation "org.springframework:spring-context:${springVersion}"
-    implementation "org.springframework:spring-webmvc:${springVersion}"
-    implementation "org.springframework:spring-jdbc:${springVersion}"
-    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    compileOnly "org.springframework:spring-beans:${springVersion}"
+    compileOnly "org.springframework:spring-context:${springVersion}"
+    compileOnly "org.springframework:spring-webmvc:${springVersion}"
+    compileOnly "org.springframework:spring-jdbc:${springVersion}"
+    compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
-    testImplementation "org.springframework:spring-test:${springVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
-    testImplementation "org.assertj:assertj-core:${assertjVersion}"
-    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-    testImplementation "ca.uhn.hapi:hapi-structures-v26:2.3"
-    testImplementation "org.hibernate:hibernate-core:4.3.11.Final"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    testCompileOnly "org.springframework:spring-test:${springVersion}"
+    testCompileOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testCompileOnly "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    testCompileOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testCompileOnly "org.assertj:assertj-core:${assertjVersion}"
+    testCompileOnly "org.mockito:mockito-core:${mockitoVersion}"
+    testCompileOnly "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testCompileOnly "ca.uhn.hapi:hapi-structures-v26:2.3"
+    testCompileOnly "org.hibernate:hibernate-core:4.3.11.Final"
+}
+
+tasks.jar {
+    enabled = false
+}
+
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    minimize()
+    relocate("kotlin", "dev.dnpm.zpmdashboard.vendor.kotlin")
+    relocate("org.jetbrains", "dev.dnpm.zpmdashboard.vendor.org.jetbrains")
+}
+
+build.dependsOn shadowJar

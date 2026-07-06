@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 @RestController
 public class ZpmDashboardController {
@@ -54,29 +53,27 @@ public class ZpmDashboardController {
     public ResponseEntity<Statistics> getStatistics(@RequestParam int year) {
         final var currentYear = LocalDate.now(TimeZone.getDefault().toZoneId()).getYear();
         final var pf = List.of(
-                new Primaerfaelle(currentYear - 2, this.zpmDashboardService.findPrimaerfaelle(currentYear - 2).size()),
-                new Primaerfaelle(currentYear - 1, this.zpmDashboardService.findPrimaerfaelle(currentYear - 1).size()),
-                new Primaerfaelle(currentYear, this.zpmDashboardService.findPrimaerfaelle(currentYear).size())
+                new Primaerfaelle(currentYear - 2, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 2).size()),
+                new Primaerfaelle(currentYear - 1, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 1).size()),
+                new Primaerfaelle(currentYear, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear).size())
         );
 
         final var statistics = new Statistics(
-                this.zpmDashboardService.findDiseasesWithMtbAnmeldungInYear(year).size(),
-                this.zpmDashboardService.findDiseasesWithMtbEmpfehlungInYear(year).size(),
-                (int)this.zpmDashboardService.countConsents(year),
+                this.zpmDashboardService.findMtbAnmeldungInYear(year).size(),
+                this.zpmDashboardService.findMtbEmpfehlungInYear(year).size(),
+                this.zpmDashboardService.countConsents(year),
                 pf);
         return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/zpm-dashboard/cases")
-    public ResponseEntity<List<CaseId>> getCases(@RequestParam int year) {
-        final var cases = this.zpmDashboardService.findPrimaerfaelle(year).stream()
-                .map(disease -> new CaseId(disease.getPatient().getPatientId(), disease.getPatient().getGuid()))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<ZpmDashboardService.CaseId>> getCases(@RequestParam int year) {
+        final var cases = this.zpmDashboardService.findPrimaerfaelleCaseId(year);
         return ResponseEntity.ok(cases);
     }
 
     @GetMapping("/zpm-dashboard/cases/{guid}")
-    public ResponseEntity<ZpmDashboardService.Case> getCase(@PathVariable String guid) {
+    public ResponseEntity<?> getCase(@PathVariable String guid) {
         try {
             final var theCase = this.zpmDashboardService.findCase(guid);
             if (theCase == null) {
@@ -84,7 +81,7 @@ public class ZpmDashboardController {
             }
             return ResponseEntity.ok(theCase);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -109,16 +106,6 @@ public class ZpmDashboardController {
         public Primaerfaelle(int year, int count) {
             this.year = year;
             this.count = count;
-        }
-    }
-
-    public static class CaseId {
-        public String pid;
-        public String guid;
-
-        public CaseId(String pid, String guid) {
-            this.pid = pid;
-            this.guid = guid;
         }
     }
 

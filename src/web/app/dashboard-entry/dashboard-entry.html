@@ -19,6 +19,14 @@
                 <div>Nicht vorhanden</div>
             }
         </div>
+        <div [class.success]="data().molgenDatum">
+            <div class="name">Molgen Untersuchung</div>
+            @if (data().molgenDatum) {
+                <div>{{ data().molgenDatum | date:'dd.MM.yyyy' }}</div>
+            } @else {
+                <div>Nicht vorhanden</div>
+            }
+        </div>
         <div [class.success]="data().empfehlungsdatum">
             <div class="name">MTB Empfehlung</div>
             @if (data().empfehlungsdatum) {
@@ -27,7 +35,7 @@
                 <div>Kein MTB mit Empfehlung</div>
             }
         </div>
-        <div class="latest-doku">
+        <div [class.success]="data().latestDokuDatum" class="latest-doku">
             <div class="name">Stand Dokumentation</div>
             @if (data().latestDokuDatum) {
                 <div>{{ data().latestDokuDatum | date:'dd.MM.yyyy' }}</div>

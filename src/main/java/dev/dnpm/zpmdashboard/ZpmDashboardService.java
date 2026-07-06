@@ -26,12 +26,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ZpmDashboardService {
@@ -55,8 +54,11 @@ public class ZpmDashboardService {
     public List<Disease> findDiseasesWithMtbEmpfehlungInYear(int year) {
         final var sql = "SELECT e.id FROM dk_mtb_empfehlung e JOIN prozedur p ON (e.id = p.id) WHERE p.geloescht <> 1 AND YEAR(e.mtbdatum) = ?";
         return jdbcTemplate.queryForList(sql, new Object[]{year}, Integer.class).stream()
+                .distinct()
                 .map(this.onkostarApi::getProcedure)
-                .flatMap(procedure -> procedure.getDiseases().stream())
+                .flatMap(procedure -> procedure.getDiseaseIds().stream())
+                .distinct()
+                .map(this.onkostarApi::getDiseaseByDiseaseId)
                 .collect(Collectors.toList());
     }
 
@@ -70,8 +72,14 @@ public class ZpmDashboardService {
     }
 
     public List<Disease> findPrimaerfaelle(int year) {
+        final var lastTwoYears = Stream.of(year - 2, year - 1)
+                .flatMap(y -> this.findDiseasesWithMtbEmpfehlungInYear(y).stream().map(Disease::getId))
+                .distinct()
+                .collect(Collectors.toList());
+
         return this.findDiseasesWithMtbEmpfehlungInYear(year).stream()
-                // TODO Add filter for primaerfaelle
+                .filter(disease -> !lastTwoYears.contains(disease.getId()))
+                // TODO Add filter for primaerfaelle - Entität?
                 .collect(Collectors.toList());
     }
 

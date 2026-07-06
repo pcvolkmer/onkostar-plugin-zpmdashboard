@@ -6,6 +6,7 @@ endif
 spa:
 	npm install
 	npm run build
+	mkdir src/main/resources/static 2>/dev/null || true
 	cp dist/zpm-dashboard/browser/* src/main/resources/static/
 
 .PHONY: jar

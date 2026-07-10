@@ -65,7 +65,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         return findMtbAnmeldungInYear(year).flatMap {
             onkostarApi.getProceduresForDiseaseByForm(
                 it,
-                "MolPath Consent",
+                "MR.Consent",
                 null
             )
         }.count()
@@ -107,8 +107,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                 addValue("guid", guid)
             }
 
-            return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
-                if (rs!!.next()) {
+            return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
+                if (rs.next()) {
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
                         rs.getString("icd10"),
@@ -128,23 +128,28 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         }
     }
 
-    private fun findMolPathConsent(patientGuid: String?): String? {
+    private fun findMolPathConsent(patientGuid: String?): Consent {
         if (patientGuid == null) {
-            return null
+            return Consent(null, false)
         }
         try {
             val sql =
-                """SELECT consentdatummolpath FROM dk_mr_consent c 
+                """SELECT consentdatummolpath, consentstatusmolpath FROM dk_mr_consent c 
                 JOIN prozedur p ON (c.id = p.id) 
                 JOIN patient ON (p.patient_id = patient.id) 
-                WHERE patient.guid = :guid AND consentstatusmolpath = 'z' ORDER BY datum DESC LIMIT 1;""".trimIndent()
+                WHERE patient.guid = :guid ORDER BY datum DESC LIMIT 1;""".trimIndent()
             val params = MapSqlParameterSource().apply {
                 addValue("guid", patientGuid)
             }
-            return jdbcTemplate.queryForObject(sql, params, String::class.java)
+            return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
+                if (rs.next()) {
+                    return@ResultSetExtractor Consent(rs.getString("consentdatummolpath"), rs.getString("consentstatusmolpath") == "z")
+                }
+                Consent(null, false)
+            })
         } catch (e: Exception) {
             e.printStackTrace()
-            return null
+            return Consent(null, false)
         }
     }
 
@@ -182,10 +187,15 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var icd: String?,
         var guid: String?,
         var anmeldedatum: String?,
-        var consentdatum: String?,
+        var consent: Consent,
         var molgenDatum: String?,
         var empfehlungsdatum: String?,
         var latestDokuDatum: String?,
         var einschlussMvh: Boolean
+    )
+
+    data class Consent(
+        val datum: String?,
+        val zustimmung: Boolean = false
     )
 }

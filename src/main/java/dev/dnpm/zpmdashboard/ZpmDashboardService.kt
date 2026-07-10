@@ -114,7 +114,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         rs.getString("icd10"),
                         rs.getString("guid"),
                         rs.getString("anmeldedatum"),
-                        null,
+                        findMolPathConsent(rs.getString("guid")),
                         rs.getString("molgen_datum"),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
@@ -123,6 +123,25 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                 }
                 null
             })
+        } catch (_: Exception) {
+            return null
+        }
+    }
+
+    private fun findMolPathConsent(patientGuid: String?): String? {
+        if (patientGuid == null) {
+            return null
+        }
+        try {
+            val sql =
+                """SELECT consentdatummolpath FROM dk_mr_consent c 
+                JOIN prozedur p ON (c.id = p.id) 
+                JOIN patient ON (p.patient_id = patient.id) 
+                WHERE patient.guid = :guid AND consentstatusmolpath = 'z' ORDER BY datum DESC LIMIT 1;""".trimIndent()
+            val params = MapSqlParameterSource().apply {
+                addValue("guid", patientGuid)
+            }
+            return jdbcTemplate.queryForObject(sql, params, String::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             return null

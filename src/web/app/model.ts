@@ -37,7 +37,7 @@ export class CaseModel {
   public icd: string;
   public guid: string;
   public anmeldedatum: string | null;
-  public consentdatum: string | null;
+  public consent: Consent;
   public molgenDatum: string | null;
   public empfehlungsdatum: string | null;
   public latestDokuDatum: string | null;
@@ -48,11 +48,21 @@ export class CaseModel {
     this.icd = "C00.0";
     this.guid = "00000000-0000-0000-0000-000000000000";
     this.anmeldedatum = null;
-    this.consentdatum = null;
+    this.consent = new Consent();
     this.molgenDatum = null;
     this.empfehlungsdatum = null;
     this.latestDokuDatum = null;
     this.einschlussMvh = false;
   }
+}
+
+export class Consent {
+    public datum: string | null;
+    public zustimmung: boolean;
+
+    constructor() {
+        this.datum = null;
+        this.zustimmung = false;
+    }
 }
 

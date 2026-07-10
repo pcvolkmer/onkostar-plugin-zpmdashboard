@@ -58,7 +58,10 @@ export class MockBackendInterceptor implements HttpInterceptor {
               anmeldedatum: `2025-0${guid[1]}-0${guid[4]}`,
               empfehlungsdatum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[3]}-0${guid[5]}` : null,
               latestDokuDatum: `2025-0${guid[6]}-0${guid[7]}`,
-              consentdatum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[2]}-0${guid[3]}` : null,
+              consent: {
+                  datum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[2]}-0${guid[3]}` : null,
+                  zustimmung: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,
+              }
       };
 
       return of(new HttpResponse({

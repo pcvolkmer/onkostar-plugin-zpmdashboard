@@ -30,6 +30,10 @@
     @apply bg-green-800;
 }
 
+.dashboard-entry .warning {
+    @apply bg-yellow-600;
+}
+
 .dashboard-entry .loading {
     @apply bg-transparent text-gray-800;
 }

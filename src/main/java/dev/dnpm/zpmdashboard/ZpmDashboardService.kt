@@ -94,12 +94,13 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     fun findCase(guid: String): Case? {
         val sql =
-            """SELECT patient.patienten_id, patient.guid, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, molgen.datum AS molgen_datum, e.mtbdatum, e.modellvorhaben FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, patient.guid, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, e.modellvorhaben FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
                     JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
                     LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer)
+                    LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
                     WHERE p.geloescht <> 1 AND patient.guid = :guid LIMIT 1;""".trimIndent()
 
         try {
@@ -115,7 +116,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         rs.getString("guid"),
                         rs.getString("anmeldedatum"),
                         findMolPathConsent(rs.getString("guid")),
-                        rs.getString("molgen_datum"),
+                        MolGen(rs.getString("molgen_datum"), rs.getBoolean("molgen_korrekt")),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
                         rs.getBoolean("modellvorhaben")
@@ -188,7 +189,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var guid: String?,
         var anmeldedatum: String?,
         var consent: Consent,
-        var molgenDatum: String?,
+        var molgen: MolGen,
         var empfehlungsdatum: String?,
         var latestDokuDatum: String?,
         var einschlussMvh: Boolean
@@ -197,5 +198,10 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     data class Consent(
         val datum: String?,
         val zustimmung: Boolean = false
+    )
+
+    data class MolGen(
+        val datum: String?,
+        val korrekt: Boolean = false
     )
 }

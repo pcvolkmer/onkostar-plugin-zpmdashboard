@@ -38,7 +38,7 @@ export class CaseModel {
   public guid: string;
   public anmeldedatum: string | null;
   public consent: Consent;
-  public molgenDatum: string | null;
+  public molgen: MolGen;
   public empfehlungsdatum: string | null;
   public latestDokuDatum: string | null;
   public einschlussMvh: boolean;
@@ -49,7 +49,7 @@ export class CaseModel {
     this.guid = "00000000-0000-0000-0000-000000000000";
     this.anmeldedatum = null;
     this.consent = new Consent();
-    this.molgenDatum = null;
+    this.molgen = new MolGen();
     this.empfehlungsdatum = null;
     this.latestDokuDatum = null;
     this.einschlussMvh = false;
@@ -64,5 +64,15 @@ export class Consent {
         this.datum = null;
         this.zustimmung = false;
     }
+}
+
+export class MolGen {
+  public datum: string | null;
+  public korrekt: boolean;
+
+  constructor() {
+    this.datum = null;
+    this.korrekt = false;
+  }
 }
 

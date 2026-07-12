@@ -24,11 +24,15 @@
                 <div>Nicht vorhanden</div>
             }
         </div>
-        <div [class.success]="data().molgenDatum">
+        <div [class.success]="data().molgen.datum && data().molgen.korrekt" [class.warning]="data().molgen.datum && !data().molgen.korrekt">
             <div class="name">Molgen Untersuchung</div>
-            @if (data().molgenDatum) {
-                <div>{{ data().molgenDatum | date:'dd.MM.yyyy' }}</div>
-            } @else {
+            @if (data().molgen.datum && data().molgen.korrekt) {
+                <div>{{ data().molgen.datum | date:'dd.MM.yyyy' }}</div>
+            } @else if (data().molgen.datum && !data().molgen.korrekt) {
+                <div>{{ data().molgen.datum | date:'dd.MM.yyyy' }}</div>
+                <div>Fehlerhaft</div>
+            }
+            @else {
                 <div>Nicht vorhanden</div>
             }
         </div>

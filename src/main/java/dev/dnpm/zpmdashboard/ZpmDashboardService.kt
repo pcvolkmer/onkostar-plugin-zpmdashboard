@@ -62,13 +62,17 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     }
 
     fun countConsents(year: Int): Int {
-        return findMtbAnmeldungInYear(year).flatMap {
-            onkostarApi.getProceduresForDiseaseByForm(
-                it,
-                "MR.Consent",
-                null
-            )
-        }.count()
+        val sql = """SELECT DISTINCT p.id FROM dk_mr_consent c 
+            JOIN prozedur p ON (c.id = p.id) 
+            WHERE p.geloescht <> 1 AND YEAR(c.consentdatummolpath) = :year""".trimMargin()
+        try {
+            val params = MapSqlParameterSource().apply {
+                addValue("year", year)
+            }
+            return jdbcTemplate.queryForList(sql, params, Int::class.java).size
+        } catch (_: Exception) {
+            return 0
+        }
     }
 
     fun findPrimaerfaelleCaseId(year: Int): List<CaseId> {

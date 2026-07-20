@@ -79,7 +79,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         val sql = """SELECT DISTINCT pat.patienten_id, pat.guid FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
             JOIN patient pat ON (p.patient_id = pat.id)
-            WHERE YEAR(zaehlzeitpunkt) = :year AND p.geloescht <> 1 AND zpm.primaerfall = 1
+            WHERE YEAR(zaehlzeitpunkt) = :year AND p.geloescht <> 1 AND zpm.primaerfall = 1 AND pat.nachname <> 'Momentum'
             ORDER BY zaehlzeitpunkt, pat.patienten_id;
         """.trimIndent()
 

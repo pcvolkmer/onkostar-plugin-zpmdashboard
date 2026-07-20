@@ -1,5 +1,5 @@
 <div class="dashboard-entry">
-    @if (data().anmeldedatum) {
+    @if (data().pid) {
         <div class="case-id">
             <div>PID: <b>{{ data().pid }}</b></div>
             <div><b>{{ data().icd }}</b></div>
@@ -9,7 +9,11 @@
         </div>
         <div [class.success]="data().anmeldedatum">
             <div class="name">Anmeldedatum MTB</div>
-            <div>{{ data().anmeldedatum | date:'dd.MM.yyyy' }}</div>
+            @if (data().anmeldedatum) {
+                <div>{{ data().anmeldedatum | date:'dd.MM.yyyy' }}</div>
+            } @else {
+                <div>Nicht vorhanden</div>
+            }
         </div>
         <div [class.success]="data().consent.datum && data().consent.zustimmung" [class.warning]="data().consent.datum && !data().consent.zustimmung">
             <div class="name">MolPath-Consent</div>

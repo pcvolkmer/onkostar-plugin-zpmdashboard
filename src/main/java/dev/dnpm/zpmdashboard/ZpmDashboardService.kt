@@ -102,7 +102,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
-                    JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
+                    LEFT JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
                     LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer)
                     LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
                     WHERE p.geloescht <> 1 AND patient.guid = :guid LIMIT 1;""".trimIndent()

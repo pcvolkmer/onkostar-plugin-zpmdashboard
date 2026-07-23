@@ -3,8 +3,8 @@
         <span>Statistiken</span>
         &nbsp;
         <select (change)="onYearChange($event)">
-            @for (year of years(); track year) {
-                <option value="{{year}}">{{year}}</option>
+            @for (y of years(); track y) {
+                <option value="{{y}}" [selected]="y == year()">{{y}}</option>
             }
         </select>
     </h2>
@@ -34,7 +34,15 @@
             }
         </ul>
     </div>
-    <h2>Primärfälle</h2>
+    <h2>
+        Primärfälle
+        &nbsp;
+        <select (change)="onYearChange($event)">
+            @for (y of years(); track y) {
+                <option value="{{y}}" [selected]="y == year()">{{y}}</option>
+            }
+        </select>
+    </h2>
     <div>
         @if (cases().length === 0) {
             <p>Keine Primärfälle gefunden.</p>
@@ -42,7 +50,7 @@
             <ul>
                 @for (caseId of cases(); track caseId) {
                     <li>
-                        <app-dashboard-entry [guid]="caseId.guid">
+                        <app-dashboard-entry [patientGuid]="caseId.patientGuid" [procedureGuid]="caseId.procedureGuid">
                             <div class="dashboard-entry">Lade Daten ...</div>
                         </app-dashboard-entry>
                     </li>

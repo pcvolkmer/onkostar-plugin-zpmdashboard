@@ -12,7 +12,8 @@ import {DatePipe} from "@angular/common";
   styleUrl: './dashboard-entry.css',
 })
 export class DashboardEntry implements OnInit {
-  @Input() guid!: string;
+  @Input() patientGuid!: string;
+  @Input() procedureGuid!: string;
 
   protected data = signal<CaseModel>(new CaseModel());
 
@@ -21,8 +22,9 @@ export class DashboardEntry implements OnInit {
   }
 
   ngOnInit() {
-    this.onkostarService.getCase(this.guid).subscribe(res => {
-      res.guid = btoa(res.guid);
+    this.onkostarService.getCase(this.patientGuid, this.procedureGuid).subscribe(res => {
+      res.patientGuid = btoa(res.patientGuid);
+      res.procedureGuid = btoa(res.procedureGuid);
       this.data.set(res);
     });
   }

@@ -1,4 +1,15 @@
 <main class="main-content">
+    <h2>Primärfälle der letzten drei Jahre</h2>
+    <div class="statistics">
+        <ul class="cols-3">
+            @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
+                <li>
+                    <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
+                    <span class="value">{{primaerfall.count}}</span>
+                </li>
+            }
+        </ul>
+    </div>
     <h2>
         <span>Statistiken</span>
         &nbsp;
@@ -9,29 +20,35 @@
         </select>
     </h2>
     <div class="statistics">
-        <h3>Kennzahlen {{ year() }}</h3>
-        <ul>
+        <ul class="cols-4">
             <li>
                 <span class="name">Anmeldungen</span>
                 <span class="value">{{statistics().anmeldungen}}</span>
+            </li>
+            <li>
+                <span class="name">Interne Zuweisungen</span>
+                <span class="value">{{internCount}}</span>
+            </li>
+            <li>
+                <span class="name">Externe Zuweisungen</span>
+                <span class="value">{{externCount}}</span>
             </li>
             <li>
                 <span class="name">Consents</span>
                 <span class="value">{{statistics().consents}}</span>
             </li>
             <li>
-                <span class="name">Empfehlungen</span>
+                <span class="name">MTB-Empfehlungen</span>
                 <span class="value">{{statistics().empfehlungen}}</span>
             </li>
-        </ul>
-        <h3>Primärfälle der letzten drei Jahre</h3>
-        <ul>
-            @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
-                <li>
-                    <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
-                    <span class="value">{{primaerfall.count}}</span>
-                </li>
-            }
+            <li>
+                <span class="name">Offlabel-Empfehlungen</span>
+                <span class="value">{{offlabelCount}}</span>
+            </li>
+            <li>
+                <span class="name">Studien-Empfehlungen</span>
+                <span class="value">{{studyCount}}</span>
+            </li>
         </ul>
     </div>
     <h2>
@@ -50,7 +67,12 @@
             <ul>
                 @for (caseId of cases(); track caseId) {
                     <li>
-                        <app-dashboard-entry [patientGuid]="caseId.patientGuid" [procedureGuid]="caseId.procedureGuid">
+                        <app-dashboard-entry
+                                (internexternChange)="updateInternexternCount($event)"
+                                (offlabelCountChange)="updateOfflabelCount()"
+                                (studyCountChange)="updateStudyCount()"
+                                [patientGuid]="caseId.patientGuid"
+                                [procedureGuid]="caseId.procedureGuid">
                             <div class="dashboard-entry">Lade Daten ...</div>
                         </app-dashboard-entry>
                     </li>

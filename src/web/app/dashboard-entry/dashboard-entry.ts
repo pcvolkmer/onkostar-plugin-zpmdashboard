@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, Input, OnInit, output, signal} from '@angular/core';
 import {CaseModel} from "../model";
 import {OnkostarService} from "../onkostar.service";
 import {DatePipe} from "@angular/common";
@@ -17,6 +17,10 @@ export class DashboardEntry implements OnInit {
 
   protected data = signal<CaseModel>(new CaseModel());
 
+  public internexternChange = output<string | null>();
+  public offlabelCountChange = output();
+  public studyCountChange = output();
+
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
   }
@@ -26,6 +30,14 @@ export class DashboardEntry implements OnInit {
       res.patientGuid = btoa(res.patientGuid);
       res.procedureGuid = btoa(res.procedureGuid);
       this.data.set(res);
+
+      this.internexternChange.emit(res.internextern)
+      if (res.offlabel) {
+        this.offlabelCountChange.emit();
+      }
+      if (res.studie) {
+        this.studyCountChange.emit();
+      }
     });
   }
 }

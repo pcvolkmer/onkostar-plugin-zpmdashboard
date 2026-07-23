@@ -72,10 +72,10 @@ public class ZpmDashboardController {
         return ResponseEntity.ok(cases);
     }
 
-    @GetMapping("/zpm-dashboard/cases/{guid}")
-    public ResponseEntity<?> getCase(@PathVariable String guid) {
+    @GetMapping("/zpm-dashboard/cases/{patientGuid}/{procedureGuid}")
+    public ResponseEntity<?> getCase(@PathVariable String patientGuid, @PathVariable String procedureGuid) {
         try {
-            final var theCase = this.zpmDashboardService.findCase(guid);
+            final var theCase = this.zpmDashboardService.findCase(patientGuid, procedureGuid);
             if (theCase == null) {
                 return ResponseEntity.notFound().build();
             }

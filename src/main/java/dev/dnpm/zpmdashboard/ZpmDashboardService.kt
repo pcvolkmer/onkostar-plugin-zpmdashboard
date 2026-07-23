@@ -76,7 +76,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     }
 
     fun findPrimaerfaelleCaseId(year: Int): List<CaseId> {
-        val sql = """SELECT DISTINCT pat.patienten_id, pat.guid FROM dk_zpm_auswertungen zpm
+        val sql =
+            """SELECT DISTINCT pat.patienten_id, pat.guid AS pat_guid, p.guid AS proc_guid FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
             JOIN patient pat ON (p.patient_id = pat.id)
             WHERE YEAR(zaehlzeitpunkt) = :year AND p.geloescht <> 1 AND zpm.primaerfall = 1 AND pat.nachname <> 'Momentum'
@@ -90,26 +91,29 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
             val caseIds = mutableListOf<CaseId>()
             while (rs!!.next()) {
-                caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("guid")))
+                caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("pat_guid"), rs.getString("proc_guid")))
             }
             return@ResultSetExtractor caseIds
         })
     }
 
-    fun findCase(guid: String): Case? {
+    fun findCase(patientGuid: String, procedureGuid: String): Case? {
         val sql =
-            """SELECT patient.patienten_id, patient.guid, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, e.modellvorhaben FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, e.modellvorhaben FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
                     LEFT JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
                     LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer)
                     LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
-                    WHERE p.geloescht <> 1 AND patient.guid = :guid LIMIT 1;""".trimIndent()
+                    JOIN prozedur zpmp ON (zpmp.guid = :zpm_guid)
+                    JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id)
+                    WHERE p.geloescht <> 1 AND patient.guid = :pat_guid LIMIT 1;""".trimIndent()
 
         try {
             val params = MapSqlParameterSource().apply {
-                addValue("guid", guid)
+                addValue("pat_guid", patientGuid)
+                addValue("zpm_guid", procedureGuid)
             }
 
             return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
@@ -117,9 +121,10 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
                         rs.getString("icd10"),
-                        rs.getString("guid"),
+                        patientGuid,
+                        procedureGuid,
                         rs.getString("anmeldedatum"),
-                        findMolPathConsent(rs.getString("guid")),
+                        findMolPathConsent(patientGuid),
                         MolGen(rs.getString("molgen_datum"), rs.getBoolean("molgen_korrekt")),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
@@ -148,7 +153,10 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             }
             return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
                 if (rs.next()) {
-                    return@ResultSetExtractor Consent(rs.getString("consentdatummolpath"), rs.getString("consentstatusmolpath") == "z")
+                    return@ResultSetExtractor Consent(
+                        rs.getString("consentdatummolpath"),
+                        rs.getString("consentstatusmolpath") == "z"
+                    )
                 }
                 Consent(null, false)
             })
@@ -184,13 +192,15 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     data class CaseId(
         val pid: String,
-        val guid: String
+        val patientGuid: String,
+        val procedureGuid: String,
     )
 
     data class Case(
         var pid: String?,
         var icd: String?,
-        var guid: String?,
+        var patientGuid: String,
+        var procedureGuid: String,
         var anmeldedatum: String?,
         var consent: Consent,
         var molgen: MolGen,

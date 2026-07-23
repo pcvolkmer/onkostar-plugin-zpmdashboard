@@ -24,18 +24,21 @@ export class PrimaerfaelleModel {
 
 export class CaseId {
   public pid: string;
-  public guid: string;
+  public patientGuid: string;
+  public procedureGuid: string;
 
   constructor() {
     this.pid = "0";
-    this.guid = "00000000-0000-0000-0000-000000000000";
+    this.patientGuid = "00000000-0000-0000-0000-000000000000";
+    this.procedureGuid = "00000000-0000-0000-0000-000000000000";
   }
 }
 
 export class CaseModel {
   public pid: string;
   public icd: string;
-  public guid: string;
+  public patientGuid: string;
+  public procedureGuid: string;
   public anmeldedatum: string | null;
   public consent: Consent;
   public molgen: MolGen;
@@ -46,7 +49,8 @@ export class CaseModel {
   constructor() {
     this.pid = "0";
     this.icd = "C00.0";
-    this.guid = "00000000-0000-0000-0000-000000000000";
+    this.patientGuid = "00000000-0000-0000-0000-000000000000";
+    this.procedureGuid = "00000000-0000-0000-0000-000000000000";
     this.anmeldedatum = null;
     this.consent = new Consent();
     this.molgen = new MolGen();

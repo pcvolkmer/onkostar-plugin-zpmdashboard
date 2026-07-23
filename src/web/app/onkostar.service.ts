@@ -19,7 +19,7 @@ export class OnkostarService {
     return this.http.get<CaseId[]>(`/onkostar/zpm-dashboard/cases?year=${year}`);
   }
 
-  getCase(guid: string): Observable<CaseModel> {
-    return this.http.get<CaseModel>(`/onkostar/zpm-dashboard/cases/${guid}`);
+  getCase(patientGuid: string, procedureGuid: string): Observable<CaseModel> {
+    return this.http.get<CaseModel>(`/onkostar/zpm-dashboard/cases/${patientGuid}/${procedureGuid}`);
   }
 }

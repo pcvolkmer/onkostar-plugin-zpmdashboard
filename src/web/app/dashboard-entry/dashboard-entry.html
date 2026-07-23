@@ -4,7 +4,7 @@
             <div>PID: <b>{{ data().pid }}</b></div>
             <div><b>{{ data().icd }}</b></div>
             <div>
-                <a class="button" href="/onkostar/index.html?patientId={{ data().guid }}" target="_blank">Zum Patienten in Onkostar</a>
+                <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten in Onkostar</a>
             </div>
         </div>
         <div [class.success]="data().anmeldedatum">

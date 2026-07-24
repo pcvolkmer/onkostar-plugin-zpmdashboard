@@ -1,14 +1,20 @@
 <main class="main-content">
     <h2>Primärfälle der letzten drei Jahre</h2>
     <div class="statistics">
-        <ul class="cols-3">
+        <ul class="cols-3 pf">
             @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
-                <li>
+                <li [class.currentyear]="primaerfall.year.toString() == year()">
                     <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
                     <span class="value">{{primaerfall.count}}</span>
                 </li>
             }
         </ul>
+        @if (statistics().primaerfaelle.length == 0) {
+            <div class="loading">
+                <div class="spinner"></div>
+                <div>Lade Daten ...</div>
+            </div>
+        }
     </div>
     <h2>
         <span>Statistiken</span>
@@ -21,33 +27,37 @@
     </h2>
     <div class="statistics">
         <ul class="cols-4">
-            <li>
+            <li [class.zerovalue]="statistics().anmeldungen === 0">
                 <span class="name">Anmeldungen</span>
                 <span class="value">{{statistics().anmeldungen}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="internCount === 0">
                 <span class="name">Interne Zuweisungen</span>
                 <span class="value">{{internCount}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="externCount === 0">
                 <span class="name">Externe Zuweisungen</span>
                 <span class="value">{{externCount}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="statistics().consents === 0">
                 <span class="name">Consents</span>
                 <span class="value">{{statistics().consents}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="statistics().empfehlungen === 0">
                 <span class="name">MTB-Empfehlungen</span>
                 <span class="value">{{statistics().empfehlungen}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="offlabelCount === 0">
                 <span class="name">Offlabel-Empfehlungen</span>
                 <span class="value">{{offlabelCount}}</span>
             </li>
-            <li>
+            <li [class.zerovalue]="studyCount === 0">
                 <span class="name">Studien-Empfehlungen</span>
                 <span class="value">{{studyCount}}</span>
+            </li>
+            <li class="empty">
+                <span class="name">Leer</span>
+                <span class="value">0</span>
             </li>
         </ul>
     </div>

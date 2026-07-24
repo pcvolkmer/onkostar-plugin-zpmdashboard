@@ -59,6 +59,7 @@ main.main-content {
 
 .statistics {
   @apply p-1 bg-gray-100 mb-4 rounded drop-shadow-gray-400 drop-shadow-sm;
+  min-height: 6rem;
 }
 
 .statistics > ul {
@@ -78,10 +79,42 @@ main.main-content {
   background-color: var(--color-primary);
 }
 
+.statistics > ul > li.zerovalue {
+  @apply bg-gray-600;
+}
+
+.statistics > ul > li.empty {
+  @apply border border-dashed border-gray-600 bg-gray-200 drop-shadow-none;
+}
+
+.statistics > ul > li.empty > span {
+  visibility: hidden;
+}
+
 .statistics > ul > li span {
   @apply p-1 inline-block;
 }
 
 .statistics > ul > li .value {
   @apply font-bold text-4xl;
+}
+
+.statistics > .pf > li {
+  opacity: 0.8;
+}
+
+.statistics > .pf > li.currentyear {
+  background-color: var(--color-primary);
+  border: 2px solid white;
+  outline: 2px solid var(--color-primary);
+  opacity: 1.0;
+}
+
+.loading {
+  @apply bg-transparent text-gray-800;
+}
+
+.loading .spinner {
+  @apply w-8 h-8 border-4 border-gray-600 border-solid border-t-transparent rounded-full text-center mx-auto my-2;
+  animation: spin .5s linear infinite;
 }

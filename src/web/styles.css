@@ -62,7 +62,15 @@ main.main-content {
 }
 
 .statistics > ul {
-  @apply grid grid-cols-3 gap-4;
+  @apply grid gap-4;
+}
+
+.statistics > ul.cols-3 {
+  @apply grid-cols-3;
+}
+
+.statistics > ul.cols-4 {
+  @apply grid-cols-4;
 }
 
 .statistics > ul > li {

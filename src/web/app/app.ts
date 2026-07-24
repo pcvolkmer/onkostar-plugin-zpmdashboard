@@ -15,6 +15,11 @@ export class App implements OnInit {
   protected cases = signal<CaseId[]>([]);
   protected year = signal<string>(new Date().getFullYear().toString());
 
+  protected internCount = 0;
+  protected externCount = 0;
+  protected offlabelCount = 0;
+  protected studyCount = 0;
+
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
   }
@@ -38,6 +43,11 @@ export class App implements OnInit {
   }
 
   protected loadData() {
+    this.internCount = 0;
+    this.externCount = 0;
+    this.offlabelCount = 0;
+    this.studyCount = 0;
+
     this.statistics.set(new StatisticsModel());
     this.onkostarService.getStatistics(this.year()).subscribe(res => {
       this.statistics.set(res);
@@ -46,5 +56,21 @@ export class App implements OnInit {
     this.onkostarService.getCases(this.year()).subscribe(res => {
       this.cases.set(res);
     });
+  }
+
+  protected updateInternexternCount(value: string | null) {
+    if (value === 'E') {
+      this.externCount++;
+    } else if (value === 'I') {
+      this.internCount++;
+    }
+  }
+
+  protected updateOfflabelCount() {
+    this.offlabelCount++;
+  }
+
+  protected updateStudyCount() {
+    this.studyCount++;
   }
 }

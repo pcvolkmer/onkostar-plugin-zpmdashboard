@@ -40,10 +40,13 @@ export class CaseModel {
   public patientGuid: string;
   public procedureGuid: string;
   public anmeldedatum: string | null;
+  public internextern: string | null;
   public consent: Consent;
   public molgen: MolGen;
   public empfehlungsdatum: string | null;
   public latestDokuDatum: string | null;
+  public offlabel: boolean;
+  public studie: boolean;
   public einschlussMvh: boolean;
 
   constructor() {
@@ -52,10 +55,13 @@ export class CaseModel {
     this.patientGuid = "00000000-0000-0000-0000-000000000000";
     this.procedureGuid = "00000000-0000-0000-0000-000000000000";
     this.anmeldedatum = null;
+    this.internextern = null;
     this.consent = new Consent();
     this.molgen = new MolGen();
     this.empfehlungsdatum = null;
     this.latestDokuDatum = null;
+    this.offlabel = false;
+    this.studie = false;
     this.einschlussMvh = false;
   }
 }

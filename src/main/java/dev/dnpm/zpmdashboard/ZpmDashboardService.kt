@@ -99,7 +99,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     fun findCase(patientGuid: String, procedureGuid: String): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, e.modellvorhaben FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpm.offlabel, zpm.studie, e.modellvorhaben FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
@@ -124,10 +124,13 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         patientGuid,
                         procedureGuid,
                         rs.getString("anmeldedatum"),
+                        rs.getString("internextern"),
                         findMolPathConsent(patientGuid),
                         MolGen(rs.getString("molgen_datum"), rs.getBoolean("molgen_korrekt")),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
+                        rs.getBoolean("offlabel"),
+                        rs.getBoolean("studie"),
                         rs.getBoolean("modellvorhaben")
                     )
                 }
@@ -202,10 +205,13 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var patientGuid: String,
         var procedureGuid: String,
         var anmeldedatum: String?,
+        var internextern: String?,
         var consent: Consent,
         var molgen: MolGen,
         var empfehlungsdatum: String?,
         var latestDokuDatum: String?,
+        var offlabel: Boolean,
+        var studie: Boolean,
         var einschlussMvh: Boolean
     )
 

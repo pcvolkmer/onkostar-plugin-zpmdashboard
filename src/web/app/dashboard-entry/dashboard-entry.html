@@ -14,6 +14,12 @@
             } @else {
                 <div>Nicht vorhanden</div>
             }
+
+            @if (data().internextern === 'E') {
+                <div>Extern zugewiesen</div>
+            } @else if (data().internextern === 'I') {
+                <div>Intern zugewiesen</div>
+            }
         </div>
         <div [class.success]="data().consent.datum && data().consent.zustimmung" [class.warning]="data().consent.datum && !data().consent.zustimmung">
             <div class="name">MolPath-Consent</div>
@@ -41,9 +47,16 @@
             }
         </div>
         <div [class.success]="data().empfehlungsdatum">
-            <div class="name">MTB Empfehlung</div>
+            @if (data().studie) {
+                <div class="name">MTB Studienempfehlung</div>
+            } @else {
+                <div class="name">MTB Empfehlung</div>
+            }
             @if (data().empfehlungsdatum) {
                 <div>{{ data().empfehlungsdatum | date:'dd.MM.yyyy' }}</div>
+                @if (data().offlabel) {
+                    <div>Offlabel</div>
+                }
             } @else {
                 <div>Kein MTB mit Empfehlung</div>
             }

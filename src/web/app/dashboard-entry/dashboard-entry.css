@@ -34,15 +34,6 @@
     @apply bg-yellow-600;
 }
 
-.dashboard-entry .loading {
-    @apply bg-transparent text-gray-800;
-}
-
-.dashboard-entry .loading .spinner {
-    @apply w-8 h-8 border-4 border-gray-600 border-solid border-t-transparent rounded-full text-center mx-auto my-2;
-    animation: spin .5s linear infinite;
-}
-
 .dashboard-entry .name {
     @apply font-bold mb-3;
 }

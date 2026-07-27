@@ -95,7 +95,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             while (rs!!.next()) {
                 caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("pat_guid"), rs.getString("proc_guid")))
             }
-            return@ResultSetExtractor caseIds
+            return@ResultSetExtractor caseIds.distinctBy { it.patientGuid }
         })
     }
 

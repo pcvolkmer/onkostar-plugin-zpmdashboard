@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.2...v0.1.3) (2026-07-27)
+
+
+### Bug Fixes
+
+* use documents documented by Studensek. Hämatologie ([#23](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/23)) ([ed7f46b](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/ed7f46b4249333debb355afd8fa424c9e0f6b580))
+
 ## [0.1.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.1...v0.1.2) (2026-07-27)
 
 

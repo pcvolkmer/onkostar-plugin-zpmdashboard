@@ -172,9 +172,10 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     }
 
     private fun findLatestDokuDatum(erkrankungId: Int): String? {
+        // Personenstamm: ORBIS, DNPM, MTB
         val sql = """SELECT erstelldatum FROM prozedur 
             JOIN erkrankung_prozedur ON (prozedur.id = erkrankung_prozedur.prozedur_id) 
-            WHERE geloescht <> 1 AND erkrankung_id = :id ORDER BY erstelldatum DESC LIMIT 1;""".trimIndent()
+            WHERE geloescht <> 1 AND erkrankung_id = :id AND personenstamm IN (1,26,28) ORDER BY erstelldatum DESC LIMIT 1;""".trimIndent()
 
         val params = MapSqlParameterSource().apply {
             addValue("id", erkrankungId)

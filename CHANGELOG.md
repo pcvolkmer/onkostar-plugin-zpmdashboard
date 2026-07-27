@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.0...v0.1.1) (2026-07-27)
+
+
+### Features
+
+* count unknown as intern PF ([#16](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/16)) ([38494f0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/38494f0178c2ccb5806044cd66317f8eae3f22a0))
+* ignore momentum study in general statistics ([#18](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/18)) ([baa63d9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/baa63d9a64a602a024b07341a7e4564563aaf72d))
+* reorder statistics elements ([#19](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/19)) ([8483051](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/848305197f5b441e97b2624622877f7e25fd851c))
+
+
+### Bug Fixes
+
+* load data of cases without "ZPM Auswertung" ([#20](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/20)) ([07cf019](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/07cf019fe892bbeb77944db1775a585eec3d7dac))
+
 ## [0.1.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.0...v0.1.0) (2026-07-24)
 
 

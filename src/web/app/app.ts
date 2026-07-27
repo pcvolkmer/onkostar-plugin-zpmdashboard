@@ -61,7 +61,7 @@ export class App implements OnInit {
   protected updateInternexternCount(value: string | null) {
     if (value === 'E') {
       this.externCount++;
-    } else if (value === 'I') {
+    } else {
       this.internCount++;
     }
   }

@@ -32,32 +32,34 @@ import javax.sql.DataSource
 class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: DataSource?) {
     private val jdbcTemplate: NamedParameterJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
-    fun findMtbAnmeldungInYear(year: Int): List<Int> {
-        val sql = """SELECT DISTINCT p.id FROM dk_mtb_anmeldung a 
+    fun countMtbAnmeldungInYear(year: Int): Int {
+        val sql = """SELECT DISTINCT pat.id FROM dk_mtb_anmeldung a 
             JOIN prozedur p ON (a.id = p.id) 
-            WHERE p.geloescht <> 1 AND YEAR(a.anmeldedatum) = :year""".trimIndent()
+            JOIN patient pat ON (pat.id = p.patient_id) 
+            WHERE p.geloescht <> 1 AND pat.nachname <> 'Momentum' AND YEAR(a.anmeldedatum) = :year""".trimIndent()
 
         try {
             val params = MapSqlParameterSource().apply {
                 addValue("year", year)
             }
-            return jdbcTemplate.queryForList(sql, params, Int::class.java)
+            return jdbcTemplate.queryForList(sql, params, Int::class.java).size
         } catch (_: Exception) {
-            return emptyList()
+            return 0
         }
     }
 
-    fun findMtbEmpfehlungInYear(year: Int): List<Int> {
-        val sql = """SELECT DISTINCT p.id FROM dk_mtb_empfehlung e 
+    fun countMtbEmpfehlungInYear(year: Int): Int {
+        val sql = """SELECT DISTINCT pat.id FROM dk_mtb_empfehlung e 
             JOIN prozedur p ON (e.id = p.id) 
-            WHERE p.geloescht <> 1 AND YEAR(e.mtbdatum) = :year""".trimMargin()
+            JOIN patient pat ON (pat.id = p.patient_id) 
+            WHERE p.geloescht <> 1 AND pat.nachname <> 'Momentum' AND YEAR(e.mtbdatum) = :year""".trimMargin()
         try {
             val params = MapSqlParameterSource().apply {
                 addValue("year", year)
             }
-            return jdbcTemplate.queryForList(sql, params, Int::class.java)
+            return jdbcTemplate.queryForList(sql, params, Int::class.java).size
         } catch (_: Exception) {
-            return emptyList()
+            return 0
         }
     }
 

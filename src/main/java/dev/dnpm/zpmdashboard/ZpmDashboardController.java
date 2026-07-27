@@ -59,8 +59,8 @@ public class ZpmDashboardController {
         );
 
         final var statistics = new Statistics(
-                this.zpmDashboardService.findMtbAnmeldungInYear(year).size(),
-                this.zpmDashboardService.findMtbEmpfehlungInYear(year).size(),
+                this.zpmDashboardService.countMtbAnmeldungInYear(year),
+                this.zpmDashboardService.countMtbEmpfehlungInYear(year),
                 this.zpmDashboardService.countConsents(year),
                 pf);
         return ResponseEntity.ok(statistics);

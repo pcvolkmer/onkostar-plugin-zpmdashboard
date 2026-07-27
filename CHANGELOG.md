@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.3...v0.1.4) (2026-07-27)
+
+
+### Bug Fixes
+
+* use only the first dk_zpm_auswertung entry by patient ([#25](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/25)) ([a82cf2d](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/a82cf2d8661cff2595cb787fe4c4612861769fef))
+
 ## [0.1.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.2...v0.1.3) (2026-07-27)
 
 

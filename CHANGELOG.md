@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.1...v0.1.2) (2026-07-27)
+
+
+### Bug Fixes
+
+* use documents from ORBIS,DNPM,MTB only ([#21](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/21)) ([f1a5b31](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/f1a5b317838448a02d8df9b95ce19957bf620510))
+
 ## [0.1.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.0...v0.1.1) (2026-07-27)
 
 

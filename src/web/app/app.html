@@ -28,36 +28,36 @@
     <div class="statistics">
         <ul class="cols-4">
             <li [class.zerovalue]="statistics().anmeldungen === 0">
-                <span class="name">Anmeldungen</span>
+                <span class="name">MTB-Anmeldungen</span>
                 <span class="value">{{statistics().anmeldungen}}</span>
-            </li>
-            <li [class.zerovalue]="internCount === 0">
-                <span class="name">Interne Zuweisungen</span>
-                <span class="value">{{internCount}}</span>
-            </li>
-            <li [class.zerovalue]="externCount === 0">
-                <span class="name">Externe Zuweisungen</span>
-                <span class="value">{{externCount}}</span>
-            </li>
-            <li [class.zerovalue]="statistics().consents === 0">
-                <span class="name">Consents</span>
-                <span class="value">{{statistics().consents}}</span>
             </li>
             <li [class.zerovalue]="statistics().empfehlungen === 0">
                 <span class="name">MTB-Empfehlungen</span>
                 <span class="value">{{statistics().empfehlungen}}</span>
             </li>
-            <li [class.zerovalue]="offlabelCount === 0">
-                <span class="name">Offlabel-Empfehlungen</span>
-                <span class="value">{{offlabelCount}}</span>
-            </li>
-            <li [class.zerovalue]="studyCount === 0">
-                <span class="name">Studien-Empfehlungen</span>
-                <span class="value">{{studyCount}}</span>
+            <li [class.zerovalue]="statistics().consents === 0">
+                <span class="name">Consents</span>
+                <span class="value">{{statistics().consents}}</span>
             </li>
             <li class="empty">
                 <span class="name">Leer</span>
                 <span class="value">0</span>
+            </li>
+            <li [class.zerovalue]="internCount === 0">
+                <span class="name">Primärfälle (intern)</span>
+                <span class="value">{{internCount}}</span>
+            </li>
+            <li [class.zerovalue]="externCount === 0">
+                <span class="name">Primärfälle (extern)</span>
+                <span class="value">{{externCount}}</span>
+            </li>
+            <li [class.zerovalue]="offlabelCount === 0">
+                <span class="name">Primärfälle (off-label)</span>
+                <span class="value">{{offlabelCount}}</span>
+            </li>
+            <li [class.zerovalue]="studyCount === 0">
+                <span class="name">Primärfälle (Studie)</span>
+                <span class="value">{{studyCount}}</span>
             </li>
         </ul>
     </div>

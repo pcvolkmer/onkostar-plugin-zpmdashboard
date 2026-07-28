@@ -15,6 +15,7 @@ export class App implements OnInit {
   protected cases = signal<CaseId[]>([]);
   protected year = signal<string>(new Date().getFullYear().toString());
 
+  protected warningCount = 0;
   protected internCount = 0;
   protected externCount = 0;
   protected offlabelCount = 0;
@@ -43,6 +44,8 @@ export class App implements OnInit {
   }
 
   protected loadData() {
+
+    this.warningCount = 0;
     this.internCount = 0;
     this.externCount = 0;
     this.offlabelCount = 0;
@@ -56,6 +59,10 @@ export class App implements OnInit {
     this.onkostarService.getCases(this.year()).subscribe(res => {
       this.cases.set(res);
     });
+  }
+
+  protected updateWarningCount() {
+    this.warningCount++;
   }
 
   protected updateInternexternCount(value: string | null) {

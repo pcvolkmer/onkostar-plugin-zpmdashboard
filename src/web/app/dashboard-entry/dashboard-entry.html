@@ -1,5 +1,5 @@
 <div class="dashboard-entry">
-    @if (data().pid) {
+    @if (data().pid.length > 0) {
         <div class="header">
             <div>PID: <b>{{ data().pid }}</b></div>
             <div>ICD-10: <b>{{ data().icd }}</b></div>
@@ -7,6 +7,11 @@
                 <div>Zählzeitpunkt: <b>{{ data().zaehlzeitpunkt | date:'dd.MM.yyyy' }}</b></div>
             } @else {
                 <div>Nicht vorhanden</div>
+            }
+            @if (data().warnings) {
+            <div class="check-required">
+                💥 <b>Achtung - Fall überprüfen!</b>
+            </div>
             }
             <div class="patient-link">
                 <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten in Onkostar</a>

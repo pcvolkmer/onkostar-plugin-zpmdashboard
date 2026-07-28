@@ -14,9 +14,11 @@ import {DatePipe} from "@angular/common";
 export class DashboardEntry implements OnInit {
   @Input() patientGuid!: string;
   @Input() procedureGuid!: string;
+  @Input() year!: string;
 
   protected data = signal<CaseModel>(new CaseModel());
 
+  public warningsChange = output();
   public internexternChange = output<string | null>();
   public offlabelCountChange = output();
   public studyCountChange = output();
@@ -26,11 +28,14 @@ export class DashboardEntry implements OnInit {
   }
 
   ngOnInit() {
-    this.onkostarService.getCase(this.patientGuid, this.procedureGuid).subscribe(res => {
+    this.onkostarService.getCase(this.patientGuid, this.procedureGuid, this.year).subscribe(res => {
       res.patientGuid = btoa(res.patientGuid);
       res.procedureGuid = btoa(res.procedureGuid);
       this.data.set(res);
 
+      if (res.warnings) {
+        this.warningsChange.emit();
+      }
       this.internexternChange.emit(res.internextern)
       if (res.offlabel) {
         this.offlabelCountChange.emit();

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.9...v0.1.10) (2026-07-28)
+
+
+### Features
+
+* warn if 'MTB Empfehlung' year not equal 'ZPM Auswertung' year ([3f79df4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/3f79df49adb119e2e4aae7b3c13b341404925c28))
+
 ## [0.1.9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.8...v0.1.9) (2026-07-28)
 
 

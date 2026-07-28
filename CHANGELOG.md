@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.6...v0.1.7) (2026-07-28)
+
+
+### Features
+
+* filter cases with warnings ([#34](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/34)) ([1776018](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/1776018c276cb9f0f31d0350bf25d64f2454320a))
+* use max 'beginndatum' ([c907078](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/c907078e1b3ccfea8f2014e9db557e38be496dbb))
+
 ## [0.1.6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.5...v0.1.6) (2026-07-28)
 
 

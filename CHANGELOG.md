@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.4...v0.1.5) (2026-07-28)
+
+
+### Features
+
+* distinct by patient and disease ([#27](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/27)) ([3638c06](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/3638c06863a82d644180b56c25c086d4ef6c3c2a))
+* show multi primaerfall warnings ([#31](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/31)) ([640b66b](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/640b66b9f37a56c4e36d0da6830425a219d700a7))
+* show ZPM zaehlzeitpunkt ([#30](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/30)) ([b94c692](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/b94c692264747e50ca6f6f3677b80ab96521a085))
+* use start date from all procedures as latest TuDok date ([#29](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/29)) ([4c445d4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/4c445d4adc0affcf6f188a0c8ebd43ca22a91aae))
+
 ## [0.1.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.3...v0.1.4) (2026-07-27)
 
 

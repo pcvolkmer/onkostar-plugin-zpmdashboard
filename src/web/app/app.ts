@@ -21,6 +21,8 @@ export class App implements OnInit {
   protected offlabelCount = 0;
   protected studyCount = 0;
 
+  protected hideNoneWarnings = false;
+
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
   }
@@ -44,6 +46,7 @@ export class App implements OnInit {
   }
 
   protected loadData() {
+    this.hideNoneWarnings = false;
 
     this.warningCount = 0;
     this.internCount = 0;
@@ -79,5 +82,21 @@ export class App implements OnInit {
 
   protected updateStudyCount() {
     this.studyCount++;
+  }
+
+  protected switchNonWarnings() {
+    this.hideNoneWarnings = !this.hideNoneWarnings;
+    if (this.hideNoneWarnings) {
+      document.querySelectorAll('.dashboard-entry').forEach(elem => {
+        (elem as HTMLElement).style.display = 'none';
+      });
+      document.querySelectorAll('.dashboard-entry:has(.check-required)').forEach(elem => {
+        (elem as HTMLElement).style.display = '';
+      });
+      return;
+    }
+    document.querySelectorAll('.dashboard-entry').forEach(elem => {
+      (elem as HTMLElement).style.display = '';
+    });
   }
 }

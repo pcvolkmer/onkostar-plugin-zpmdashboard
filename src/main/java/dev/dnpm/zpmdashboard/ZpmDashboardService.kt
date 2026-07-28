@@ -103,7 +103,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     fun findCase(patientGuid: String, procedureGuid: String): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpm.offlabel, zpm.studie, e.modellvorhaben FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
@@ -127,6 +127,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         rs.getString("icd10"),
                         patientGuid,
                         procedureGuid,
+                        rs.getString("zaehlzeitpunkt"),
                         rs.getString("anmeldedatum"),
                         rs.getString("internextern"),
                         findMolPathConsent(patientGuid),
@@ -210,6 +211,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var icd: String?,
         var patientGuid: String,
         var procedureGuid: String,
+        var zaehlzeitpunkt: String?,
         var anmeldedatum: String?,
         var internextern: String?,
         var consent: Consent,

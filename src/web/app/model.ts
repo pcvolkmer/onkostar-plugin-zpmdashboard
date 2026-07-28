@@ -39,6 +39,7 @@ export class CaseModel {
   public icd: string;
   public patientGuid: string;
   public procedureGuid: string;
+  public zaehlzeitpunkt: string | null;
   public anmeldedatum: string | null;
   public internextern: string | null;
   public consent: Consent;
@@ -54,6 +55,7 @@ export class CaseModel {
     this.icd = "C00.0";
     this.patientGuid = "00000000-0000-0000-0000-000000000000";
     this.procedureGuid = "00000000-0000-0000-0000-000000000000";
+    this.zaehlzeitpunkt = null;
     this.anmeldedatum = null;
     this.internextern = null;
     this.consent = new Consent();

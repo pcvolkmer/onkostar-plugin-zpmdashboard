@@ -49,9 +49,10 @@ export class CaseModel {
   public offlabel: boolean;
   public studie: boolean;
   public einschlussMvh: boolean;
+  public warnings: boolean;
 
   constructor() {
-    this.pid = "0";
+    this.pid = "";
     this.icd = "C00.0";
     this.patientGuid = "00000000-0000-0000-0000-000000000000";
     this.procedureGuid = "00000000-0000-0000-0000-000000000000";
@@ -65,6 +66,7 @@ export class CaseModel {
     this.offlabel = false;
     this.studie = false;
     this.einschlussMvh = false;
+    this.warnings = false;
   }
 }
 

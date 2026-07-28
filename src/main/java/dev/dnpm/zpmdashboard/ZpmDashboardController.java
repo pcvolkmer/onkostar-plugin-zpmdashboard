@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -73,9 +74,17 @@ public class ZpmDashboardController {
     }
 
     @GetMapping("/zpm-dashboard/cases/{patientGuid}/{procedureGuid}")
-    public ResponseEntity<?> getCase(@PathVariable String patientGuid, @PathVariable String procedureGuid) {
+    public ResponseEntity<?> getCase(
+            @PathVariable String patientGuid,
+            @PathVariable String procedureGuid,
+            @RequestParam(required = false) Integer year
+    ) {
+        if (null == year) {
+            year = LocalDate.now(ZoneId.systemDefault()).getYear();
+        }
+
         try {
-            final var theCase = this.zpmDashboardService.findCase(patientGuid, procedureGuid);
+            final var theCase = this.zpmDashboardService.findCase(patientGuid, procedureGuid, year);
             if (theCase == null) {
                 return ResponseEntity.notFound().build();
             }

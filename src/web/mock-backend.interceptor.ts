@@ -45,7 +45,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
 
     if (req.url.startsWith('/onkostar/zpm-dashboard/cases/') && req.method === 'GET') {
 
-      let guid = req.url.split('/').reverse()[0] ?? "00000000-0000-0000-0000-000000000000";
+      let guid = req.url.split('?')[0].split('/').reverse()[0] ?? "00000000-0000-0000-0000-000000000000";
       if (guid === "undefined") {
           guid = "12345678-1234-1234-1234-123456789012";
       }
@@ -66,7 +66,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
               molgen: {
                   datum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[2]}-0${guid[3]}` : null,
                   korrekt: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,
-              }
+              },
+              warnings: parseInt(guid[1]) % 2 == 1
       };
 
       return of(new HttpResponse({
@@ -76,21 +77,22 @@ export class MockBackendInterceptor implements HttpInterceptor {
     }
 
     if (req.url.startsWith('/onkostar/zpm-dashboard/cases') && req.method === 'GET') {
-
       const mockData = [
           {
               pid: "12345678",
-              guid: "12345678-1234-1234-1234-123456789012",
+              patientGuid: "12345678-1234-1234-1234-123456789012",
+              procedureGuid: "12345678-2234-1234-1234-123456789012",
           },
           {
               pid: "23456789",
-              guid: "23456789-1234-1234-1234-123456789012",
+              patientGuid: "23456789-1234-1234-1234-123456789012",
+              procedureGuid: "23456789-2234-1234-1234-123456789012",
           },
           {
               pid: "34567890",
-              guid: "34567890-1234-1234-1234-123456789012",
+              patientGuid: "34567890-1234-1234-1234-123456789012",
+              procedureGuid: "34567890-2234-1234-1234-123456789012",
           },
-
       ];
 
       return of(new HttpResponse({

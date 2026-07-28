@@ -39,9 +39,9 @@
                 <span class="name">Consents</span>
                 <span class="value">{{statistics().consents}}</span>
             </li>
-            <li class="empty">
-                <span class="name">Leer</span>
-                <span class="value">0</span>
+            <li class= "warnings" [class.zerovalue]="warningCount === 0">
+                <span class="name">Zu prüfen</span>
+                <span class="value">{{warningCount}}</span>
             </li>
             <li [class.zerovalue]="internCount === 0">
                 <span class="name">Primärfälle (intern)</span>
@@ -78,11 +78,13 @@
                 @for (caseId of cases(); track caseId) {
                     <li>
                         <app-dashboard-entry
+                                (warningsChange)="updateWarningCount()"
                                 (internexternChange)="updateInternexternCount($event)"
                                 (offlabelCountChange)="updateOfflabelCount()"
                                 (studyCountChange)="updateStudyCount()"
                                 [patientGuid]="caseId.patientGuid"
-                                [procedureGuid]="caseId.procedureGuid">
+                                [procedureGuid]="caseId.procedureGuid"
+                                [year]="year()">
                             <div class="dashboard-entry">Lade Daten ...</div>
                         </app-dashboard-entry>
                     </li>

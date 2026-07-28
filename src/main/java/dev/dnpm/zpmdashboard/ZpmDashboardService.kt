@@ -101,7 +101,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         })
     }
 
-    fun findCase(patientGuid: String, procedureGuid: String): Case? {
+    fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
             """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
@@ -112,7 +112,9 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
                     LEFT JOIN prozedur zpmp ON (zpmp.guid = :zpm_guid)
                     LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id)
-                    WHERE p.geloescht <> 1 AND patient.guid = :pat_guid LIMIT 1;""".trimIndent()
+                    WHERE p.geloescht <> 1 AND patient.guid = :pat_guid  
+                      AND YEAR(p.beginndatum) = :year AND YEAR(zpm.zaehlzeitpunkt) = :year 
+                      LIMIT 1;""".trimIndent()
 
         try {
             val params = MapSqlParameterSource().apply {
@@ -136,7 +138,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
                         rs.getBoolean("offlabel"),
                         rs.getBoolean("studie"),
-                        rs.getBoolean("modellvorhaben")
+                        rs.getBoolean("modellvorhaben"),
+                        hasWarnings(rs.getInt("erkrankung_id"), year)
                     )
                 }
                 null
@@ -199,6 +202,25 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         return format.format(date)
     }
 
+    private fun hasWarnings(erkrankungId: Int, year: Int): Boolean {
+        val sql =
+            """SELECT COUNT(*) FROM dk_zpm_auswertungen zpm
+            JOIN prozedur p ON (zpm.id = p.id)
+            JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+            WHERE (YEAR(zaehlzeitpunkt) = :year OR YEAR(zaehlzeitpunkt) = :year - 1) 
+              AND ep.erkrankung_id = :erkrankung_id
+              AND p.geloescht <> 1 AND zpm.primaerfall = 1;
+        """.trimIndent()
+
+        val params = MapSqlParameterSource().apply {
+            addValue("year", year)
+            addValue("erkrankung_id", erkrankungId)
+        }
+
+        // Multiple PF in this and last year
+        return jdbcTemplate.queryForObject(sql, params, Integer::class.java) > 1
+    }
+
     data class CaseId(
         val pid: String,
         val patientGuid: String,
@@ -220,7 +242,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var latestDokuDatum: String?,
         var offlabel: Boolean,
         var studie: Boolean,
-        var einschlussMvh: Boolean
+        var einschlussMvh: Boolean,
+        var warnings: Boolean = false
     )
 
     data class Consent(

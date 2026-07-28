@@ -93,6 +93,14 @@ main.main-content {
     background: var(--color-green-800);
 }
 
+.statistics > ul > li.warnings .filter {
+  @apply text-sm rounded px-2 py-1 bg-orange-900 text-white cursor-pointer;
+}
+
+.statistics > ul > li.warnings .filter:hover {
+  @apply bg-orange-950;
+}
+
 .statistics > ul > li.empty {
   @apply border border-dashed border-gray-600 bg-gray-200 drop-shadow-none;
 }

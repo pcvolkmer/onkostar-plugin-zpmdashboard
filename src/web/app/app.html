@@ -40,7 +40,10 @@
                 <span class="value">{{statistics().consents}}</span>
             </li>
             <li class= "warnings" [class.zerovalue]="warningCount === 0">
-                <span class="name">Zu prüfen</span>
+                <span class="name">Zu prüfen
+                    &nbsp;-&nbsp;
+                    <label class="filter" title="Danach filtern"><input (change)="switchNonWarnings()" class="filter" type="checkbox" [checked]="hideNoneWarnings" />&nbsp;Danach filtern</label>
+                </span>
                 <span class="value">{{warningCount}}</span>
             </li>
             <li [class.zerovalue]="internCount === 0">

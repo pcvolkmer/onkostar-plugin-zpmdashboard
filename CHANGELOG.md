@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.7...v0.1.8) (2026-07-28)
+
+
+### Features
+
+* catch possible date errors ([b3362e1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/b3362e1f3d554654c4c2a2e1fcfd8776ba2cd5df))
+* hide filter checkbox if no warnings occur ([1f5365b](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/1f5365b5a5ccd38667e6fc31c578ad557463baa0))
+
 ## [0.1.7](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.6...v0.1.7) (2026-07-28)
 
 

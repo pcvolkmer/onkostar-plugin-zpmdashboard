@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.5...v0.1.6) (2026-07-28)
+
+
+### Bug Fixes
+
+* make years implicit ([2477c3c](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/2477c3cfb52464dd7637c15b50c4edf49c16128d))
+
 ## [0.1.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.4...v0.1.5) (2026-07-28)
 
 

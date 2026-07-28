@@ -82,8 +82,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         val sql =
             """SELECT DISTINCT pat.patienten_id, pat.guid AS pat_guid, p.guid AS proc_guid, e.guid AS e_guid FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
-            JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
-            JOIN erkrankung e ON (ep.erkrankung_id = e.id)
+            LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+            LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
             JOIN patient pat ON (p.patient_id = pat.id)
             WHERE YEAR(zaehlzeitpunkt) = :year AND p.geloescht <> 1 AND zpm.primaerfall = 1 AND pat.nachname <> 'Momentum'
             ORDER BY zaehlzeitpunkt, pat.patienten_id;
@@ -96,7 +96,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
             val caseIds = mutableListOf<CaseId>()
             while (rs!!.next()) {
-                caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("pat_guid"), rs.getString("proc_guid"), rs.getString("e_guid")))
+                caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("pat_guid"), rs.getString("proc_guid"), rs.getString("e_guid").orEmpty()))
             }
             return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
         })

@@ -174,10 +174,10 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     }
 
     private fun findLatestDokuDatum(erkrankungId: Int): String? {
-        // Nur: Studiensekretariat Hämatologie
-        val sql = """SELECT erstelldatum FROM prozedur 
+        // Nur: Studiensekretariat Hämatologie (1527)?
+        val sql = """SELECT beginndatum FROM prozedur 
             JOIN erkrankung_prozedur ON (prozedur.id = erkrankung_prozedur.prozedur_id) 
-            WHERE geloescht <> 1 AND erkrankung_id = :id AND dokumentierende_fachabteilung IN (1527) ORDER BY erstelldatum DESC LIMIT 1;""".trimIndent()
+            WHERE geloescht <> 1 AND erkrankung_id = :id ORDER BY erstelldatum DESC LIMIT 1;""".trimIndent()
 
         val params = MapSqlParameterSource().apply {
             addValue("id", erkrankungId)
@@ -185,7 +185,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
         val date = jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
             if (rs!!.next()) {
-                return@ResultSetExtractor rs.getDate("erstelldatum")
+                return@ResultSetExtractor rs.getDate("beginndatum")
             }
             null
         })

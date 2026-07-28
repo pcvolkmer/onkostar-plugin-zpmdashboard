@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.8...v0.1.9) (2026-07-28)
+
+
+### Features
+
+* include cases without documented diagnosis ([cb294be](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/cb294be502c19707692edb1c7981ef036f560e5c))
+
 ## [0.1.8](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.7...v0.1.8) (2026-07-28)
 
 

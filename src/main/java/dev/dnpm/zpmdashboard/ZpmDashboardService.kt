@@ -120,6 +120,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             val params = MapSqlParameterSource().apply {
                 addValue("pat_guid", patientGuid)
                 addValue("zpm_guid", procedureGuid)
+                addValue("year", year)
             }
 
             return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
@@ -144,7 +145,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                 }
                 null
             })
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            e.printStackTrace()
             return null
         }
     }
@@ -171,8 +173,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                 }
                 Consent(null, false)
             })
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             return Consent(null, false)
         }
     }
@@ -207,13 +208,14 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             """SELECT COUNT(*) FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
             JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
-            WHERE (YEAR(zaehlzeitpunkt) = :year OR YEAR(zaehlzeitpunkt) = :year - 1) 
+            WHERE (YEAR(zaehlzeitpunkt) = :year OR YEAR(zaehlzeitpunkt) = :lastyear) 
               AND ep.erkrankung_id = :erkrankung_id
               AND p.geloescht <> 1 AND zpm.primaerfall = 1;
         """.trimIndent()
 
         val params = MapSqlParameterSource().apply {
             addValue("year", year)
+            addValue("lastyear", year - 1)
             addValue("erkrankung_id", erkrankungId)
         }
 

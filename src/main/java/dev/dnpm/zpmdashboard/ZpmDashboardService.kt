@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
+import java.sql.Date
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
 import javax.sql.DataSource
@@ -188,19 +189,13 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             addValue("id", erkrankungId)
         }
 
-        val date = jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
-            if (rs!!.next()) {
-                return@ResultSetExtractor rs.getDate("beginndatum")
-            }
-            null
-        })
-
-        if (date == null) {
+        try {
+            val date = jdbcTemplate.queryForObject(sql, params, Date::class.java) ?: return null
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            return format.format(date)
+        } catch (_: Exception) {
             return null
         }
-
-        val format = SimpleDateFormat("yyyy-MM-dd")
-        return format.format(date)
     }
 
     private fun hasWarnings(erkrankungId: Int, year: Int): Boolean {

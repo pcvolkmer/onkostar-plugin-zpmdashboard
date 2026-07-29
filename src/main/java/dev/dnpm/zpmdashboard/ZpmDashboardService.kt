@@ -115,8 +115,9 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id AND YEAR(zpm.zaehlzeitpunkt) = :year)
                     LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id)
                     WHERE p.geloescht <> 1 AND patient.guid = :pat_guid  
-                      AND YEAR(p.beginndatum) = :year 
+                      AND YEAR(p.beginndatum) >= :year 
                       AND zpm.zaehlzeitpunkt IS NOT NULL 
+                      ORDER BY YEAR(p.beginndatum) 
                       LIMIT 1;""".trimIndent()
 
         try {

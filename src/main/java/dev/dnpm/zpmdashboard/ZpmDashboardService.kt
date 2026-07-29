@@ -104,7 +104,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e 
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
@@ -112,9 +112,11 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer)
                     LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
                     LEFT JOIN prozedur zpmp ON (zpmp.guid = :zpm_guid)
-                    LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id)
+                    LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id AND YEAR(zpm.zaehlzeitpunkt) = :year)
+                    LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id)
                     WHERE p.geloescht <> 1 AND patient.guid = :pat_guid  
-                      AND YEAR(zpm.zaehlzeitpunkt) = :year 
+                      AND YEAR(p.beginndatum) = :year 
+                      AND zpm.zaehlzeitpunkt IS NOT NULL 
                       LIMIT 1;""".trimIndent()
 
         try {
@@ -141,7 +143,9 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         rs.getBoolean("offlabel"),
                         rs.getBoolean("studie"),
                         rs.getBoolean("modellvorhaben"),
-                        hasWarnings(rs.getInt("erkrankung_id"), year) || !rs.getBoolean("sameyear"),
+                        hasWarnings(rs.getInt("erkrankung_id"), year)
+                                || !rs.getBoolean("sameyear")
+                                || !rs.getBoolean("zpm_erkrankung"),
                     )
                 }
                 null
@@ -202,7 +206,7 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             """SELECT COUNT(*) FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
             JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
-            WHERE (YEAR(zaehlzeitpunkt) = :year OR YEAR(zaehlzeitpunkt) = :lastyear) 
+            WHERE (YEAR(zpm.zaehlzeitpunkt) = :year OR YEAR(zpm.zaehlzeitpunkt) = :lastyear) 
               AND ep.erkrankung_id = :erkrankung_id
               AND p.geloescht <> 1 AND zpm.primaerfall = 1;
         """.trimIndent()

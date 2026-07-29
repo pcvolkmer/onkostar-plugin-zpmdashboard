@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.10...v0.1.11) (2026-07-29)
+
+
+### Features
+
+* change selected year by click in statistics ([#40](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/40)) ([04c6ec9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/04c6ec9a215aa96d09645f22f23d501cd843ef5c))
+* warning without disease ([#38](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/38)) ([62c7421](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/62c7421bfb9ad4dd2131dbfb34c085b4bb474d3c))
+
 ## [0.1.10](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.9...v0.1.10) (2026-07-28)
 
 

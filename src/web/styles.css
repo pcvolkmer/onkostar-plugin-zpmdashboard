@@ -118,6 +118,7 @@ main.main-content {
 }
 
 .statistics > .pf > li {
+  @apply cursor-pointer;
   opacity: 0.8;
 }
 
@@ -126,6 +127,10 @@ main.main-content {
   border: 2px solid white;
   outline: 2px solid var(--color-primary);
   opacity: 1.0;
+}
+
+.statistics > .pf > li:hover {
+    @apply bg-blue-900;
 }
 
 .loading {

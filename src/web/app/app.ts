@@ -40,8 +40,12 @@ export class App implements OnInit {
     return result;
   }
 
-  protected onYearChange($event: Event) {
-    this.year.set(($event.target as HTMLSelectElement).value);
+  protected onYearChangeEvent($event: Event) {
+    this.onYearChange(($event.target as HTMLSelectElement).value);
+  }
+
+  protected onYearChange(year: string) {
+    this.year.set(year);
     this.loadData();
   }
 

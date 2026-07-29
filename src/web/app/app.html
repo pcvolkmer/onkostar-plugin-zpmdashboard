@@ -3,7 +3,7 @@
     <div class="statistics">
         <ul class="cols-3 pf">
             @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
-                <li [class.currentyear]="primaerfall.year.toString() == year()">
+                <li (click)="onYearChange(primaerfall.year.toString())" [class.currentyear]="primaerfall.year.toString() == year()">
                     <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
                     <span class="value">{{primaerfall.count}}</span>
                 </li>
@@ -19,7 +19,7 @@
     <h2>
         <span>Statistiken</span>
         &nbsp;
-        <select (change)="onYearChange($event)">
+        <select (change)="onYearChangeEvent($event)">
             @for (y of years(); track y) {
                 <option value="{{y}}" [selected]="y == year()">{{y}}</option>
             }
@@ -69,7 +69,7 @@
     <h2>
         Primärfälle
         &nbsp;
-        <select (change)="onYearChange($event)">
+        <select (change)="onYearChangeEvent($event)">
             @for (y of years(); track y) {
                 <option value="{{y}}" [selected]="y == year()">{{y}}</option>
             }

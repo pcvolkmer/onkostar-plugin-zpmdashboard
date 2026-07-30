@@ -53,7 +53,7 @@ export class CaseModel {
 
   constructor() {
     this.pid = "";
-    this.icd = "C00.0";
+    this.icd = "";
     this.patientGuid = "00000000-0000-0000-0000-000000000000";
     this.procedureGuid = "00000000-0000-0000-0000-000000000000";
     this.zaehlzeitpunkt = null;

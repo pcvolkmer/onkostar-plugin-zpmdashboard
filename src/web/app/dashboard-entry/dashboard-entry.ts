@@ -12,10 +12,12 @@ import {DatePipe} from "@angular/common";
   styleUrl: './dashboard-entry.css',
 })
 export class DashboardEntry implements OnInit {
+  @Input() pid!: string
   @Input() patientGuid!: string;
   @Input() procedureGuid!: string;
   @Input() year!: string;
 
+  protected loadingError = false;
   protected data = signal<CaseModel>(new CaseModel());
 
   public warningsChange = output();
@@ -29,6 +31,17 @@ export class DashboardEntry implements OnInit {
 
   ngOnInit() {
     this.onkostarService.getCase(this.patientGuid, this.procedureGuid, this.year).subscribe(res => {
+      if (null === res) {
+        this.warningsChange.emit();
+        let res = new CaseModel();
+        res.pid = this.pid;
+        res.patientGuid = this.patientGuid;
+        res.procedureGuid = this.procedureGuid;
+        this.data.set(res);
+        this.loadingError = true;
+        return;
+      }
+
       res.patientGuid = btoa(res.patientGuid);
       res.procedureGuid = btoa(res.procedureGuid);
       this.data.set(res);

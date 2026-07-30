@@ -87,6 +87,7 @@
                                 (internexternChange)="updateInternexternCount($event)"
                                 (offlabelCountChange)="updateOfflabelCount()"
                                 (studyCountChange)="updateStudyCount()"
+                                [pid]="caseId.pid"
                                 [patientGuid]="caseId.patientGuid"
                                 [procedureGuid]="caseId.procedureGuid"
                                 [year]="year()">

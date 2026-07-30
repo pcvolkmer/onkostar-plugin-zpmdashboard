@@ -18,6 +18,10 @@
     background: repeating-linear-gradient(45deg, var(--color-orange-200) 0, var(--color-orange-200) 4px, var(--color-orange-100) 4px, var(--color-orange-100) 8px);
 }
 
+.dashboard-entry:has(.loading) .header {
+    background: repeating-linear-gradient(45deg, var(--color-slate-200) 0, var(--color-slate-200) 4px, var(--color-slate-100) 4px, var(--color-slate-100) 8px);
+}
+
 .dashboard-entry .header > * {
     @apply inline mx-2;
 }

@@ -116,7 +116,6 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                     LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id)
                     WHERE p.geloescht <> 1 AND patient.guid = :pat_guid  
                       AND YEAR(p.beginndatum) >= :year 
-                      AND zpm.zaehlzeitpunkt IS NOT NULL 
                       ORDER BY YEAR(p.beginndatum) 
                       LIMIT 1;""".trimIndent()
 
@@ -146,7 +145,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                         rs.getBoolean("modellvorhaben"),
                         hasWarnings(rs.getInt("erkrankung_id"), year)
                                 || !rs.getBoolean("sameyear")
-                                || !rs.getBoolean("zpm_erkrankung"),
+                                || !rs.getBoolean("zpm_erkrankung")
+                                || null == rs.getString("molgen_datum"),
                     )
                 }
                 null

@@ -70,6 +70,12 @@ export class MockBackendInterceptor implements HttpInterceptor {
               warnings: parseInt(guid[1]) % 2 == 1
       };
 
+      if (parseInt(guid[1]) % 2 == 1) {
+          return of(new HttpResponse({
+              status: 404
+          })).pipe(delay(1000));
+      }
+
       return of(new HttpResponse({
         status: 200,
         body: mockData

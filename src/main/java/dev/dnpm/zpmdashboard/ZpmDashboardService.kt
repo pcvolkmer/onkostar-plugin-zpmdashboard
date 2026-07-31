@@ -104,19 +104,21 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e 
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
-                    LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+                    JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
+                    JOIN prozedur zpmp ON (zpmp.id = zpm.id) 
                     LEFT JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
-                    LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer)
-                    LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id)
-                    LEFT JOIN prozedur zpmp ON (zpmp.guid = :zpm_guid)
-                    LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.id = zpmp.id AND YEAR(zpm.zaehlzeitpunkt) = :year)
-                    LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id)
-                    WHERE p.geloescht <> 1 AND patient.guid = :pat_guid  
-                      AND YEAR(p.beginndatum) >= :year 
-                      ORDER BY YEAR(p.beginndatum) 
+                    LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer) 
+                    LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id) 
+                    LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id) 
+                    LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+                    WHERE p.geloescht <> 1 
+                      AND patient.guid = :pat_guid 
+                      AND zpmp.guid = :zpm_guid 
+                      AND YEAR(p.beginndatum) = :year  
+                      ORDER BY p.beginndatum  
                       LIMIT 1;""".trimIndent()
 
         try {
@@ -151,7 +153,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                 }
                 null
             })
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            e.printStackTrace()
             return null
         }
     }

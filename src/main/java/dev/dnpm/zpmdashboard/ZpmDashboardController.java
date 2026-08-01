@@ -20,8 +20,10 @@
 
 package dev.dnpm.zpmdashboard;
 
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,17 +39,29 @@ import java.util.TimeZone;
 public class ZpmDashboardController {
 
     private final ZpmDashboardService zpmDashboardService;
+    private final ResourceLoader resourceLoader;
 
-    public ZpmDashboardController(final ZpmDashboardService zpmDashboardService) {
+    public ZpmDashboardController(
+            final ZpmDashboardService zpmDashboardService,
+            final ResourceLoader resourceLoader
+
+            ) {
         this.zpmDashboardService = zpmDashboardService;
+        this.resourceLoader = resourceLoader;
     }
 
     @GetMapping("/zpm-dashboard")
-    public ResponseEntity<Void> getIndexPage() {
-        return ResponseEntity
-                .status(HttpStatus.TEMPORARY_REDIRECT)
-                .header(HttpHeaders.LOCATION, "/onkostar/zpm-dashboard/index.html")
-                .build();
+    public ResponseEntity<byte[]> getIndexPage(
+            @RequestParam(required = false, defaultValue = "") String year
+    ) {
+        try {
+            final var indexPage = resourceLoader.getResource("classpath:static/index.html").getInputStream().readAllBytes();
+
+            return ResponseEntity
+                    .ok(indexPage);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/zpm-dashboard/statistics")

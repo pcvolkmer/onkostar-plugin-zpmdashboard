@@ -1,7 +1,9 @@
-import { TestBed } from '@angular/core/testing';
-import { App } from './app';
+import {TestBed} from '@angular/core/testing';
+import {App} from './app';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {MockBackendInterceptor} from '../mock-backend.interceptor';
+import {provideRouter} from "@angular/router";
+
 
 describe('App', () => {
   beforeEach(async () => {
@@ -13,7 +15,10 @@ describe('App', () => {
           provide: HTTP_INTERCEPTORS,
           useClass: MockBackendInterceptor,
           multi: true
-        }
+        },
+        provideRouter([
+          { path: '', component: App }
+        ])
       ]
     }).compileComponents();
   });

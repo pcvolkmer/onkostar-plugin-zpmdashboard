@@ -1,5 +1,5 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {RouterOutlet} from '@angular/router';
+import {Component, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterOutlet} from '@angular/router';
 import {OnkostarService} from './onkostar.service';
 import {CaseId, StatisticsModel} from "./model";
 import {DashboardEntry} from "./dashboard-entry/dashboard-entry";
@@ -10,7 +10,7 @@ import {DashboardEntry} from "./dashboard-entry/dashboard-entry";
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App {
   protected statistics = signal<StatisticsModel>(new StatisticsModel());
   protected cases = signal<CaseId[]>([]);
   protected year = signal<string>(new Date().getFullYear().toString());
@@ -23,12 +23,14 @@ export class App implements OnInit {
 
   protected hideNoneWarnings = false;
 
-  constructor(readonly onkostarService: OnkostarService) {
+  constructor(readonly onkostarService: OnkostarService, readonly route: ActivatedRoute, readonly router: Router) {
     this.onkostarService = onkostarService;
-  }
-
-  ngOnInit() {
-    this.loadData();
+    this.route.queryParams.subscribe((params) => {
+      if (params['year']) {
+        this.year.set(params['year']);
+      }
+      this.loadData();
+    });
   }
 
   protected years(): string[] {
@@ -45,8 +47,12 @@ export class App implements OnInit {
   }
 
   protected onYearChange(year: string) {
-    this.year.set(year);
-    this.loadData();
+    this.router.navigate([], {
+      queryParams: {
+        year: year
+      },
+      queryParamsHandling: 'merge', // Preserve other query parameters
+    });
   }
 
   protected loadData() {

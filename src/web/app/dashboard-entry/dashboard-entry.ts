@@ -21,6 +21,7 @@ export class DashboardEntry implements OnInit {
   protected data = signal<CaseModel>(new CaseModel());
 
   public warningsChange = output();
+  public invalidPrimaerfallChange = output();
   public internexternChange = output<string | null>();
   public offlabelCountChange = output();
   public studyCountChange = output();
@@ -48,6 +49,9 @@ export class DashboardEntry implements OnInit {
 
       if (res.warnings) {
         this.warningsChange.emit();
+      }
+      if (res.warningDetails.invalidPrimaerfall) {
+        this.invalidPrimaerfallChange.emit();
       }
       this.internexternChange.emit(res.internextern)
       if (res.offlabel) {

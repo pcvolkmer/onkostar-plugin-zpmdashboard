@@ -67,6 +67,7 @@
     @apply font-bold mb-3;
 }
 
+.dashboard-entry .check-nopf,
 .dashboard-entry .check-required {
     @apply text-red-800 uppercase;
 }

@@ -141,3 +141,11 @@ main.main-content {
   @apply w-8 h-8 border-4 border-gray-600 border-solid border-t-transparent rounded-full text-center mx-auto my-1;
   animation: spin .5s linear infinite;
 }
+
+a.xls.button {
+  @apply bg-green-800 text-white px-2 py-1 my-3 rounded inline-block right-0;
+}
+
+a.xls.button:hover {
+  @apply bg-green-950;
+}

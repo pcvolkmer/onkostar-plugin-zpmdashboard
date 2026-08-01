@@ -50,6 +50,7 @@ export class CaseModel {
   public studie: boolean;
   public einschlussMvh: boolean;
   public warnings: boolean;
+  public warningDetails: WarningDetails;
 
   constructor() {
     this.pid = "";
@@ -67,6 +68,7 @@ export class CaseModel {
     this.studie = false;
     this.einschlussMvh = false;
     this.warnings = false;
+    this.warningDetails = new WarningDetails();
   }
 }
 
@@ -87,6 +89,18 @@ export class MolGen {
   constructor() {
     this.datum = null;
     this.korrekt = false;
+  }
+}
+
+export class WarningDetails {
+  public invalidPrimaerfall: boolean;
+  public noMolgen: boolean;
+  public noDisease: boolean;
+
+  constructor() {
+    this.invalidPrimaerfall = false;
+    this.noMolgen = false;
+    this.noDisease = false;
   }
 }
 

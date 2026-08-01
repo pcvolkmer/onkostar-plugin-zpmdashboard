@@ -67,14 +67,13 @@ export class MockBackendInterceptor implements HttpInterceptor {
                   datum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[2]}-0${guid[3]}` : null,
                   korrekt: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,
               },
-              warnings: parseInt(guid[1]) % 2 == 1
+              warnings: parseInt(guid[1]) % 2 == 1,
+              warningDetails: {
+                  invalidPrimaerfall: parseInt(guid[1]) % 2 == 1,
+                  noMolgen: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,
+                  noDisease: false,
+              }
       };
-
-      if (parseInt(guid[1]) % 2 == 1) {
-          return of(new HttpResponse({
-              status: 404
-          })).pipe(delay(1000));
-      }
 
       return of(new HttpResponse({
         status: 200,

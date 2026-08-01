@@ -39,15 +39,7 @@
                 <span class="name">Consents</span>
                 <span class="value">{{statistics().consents}}</span>
             </li>
-            <li class= "warnings" [class.zerovalue]="warningCount === 0">
-                <span class="name">Zu prüfen
-                    @if (warningCount > 0) {
-                        &nbsp;-&nbsp;
-                        <label class="filter" title="Danach filtern"><input (change)="switchNonWarnings()" class="filter" type="checkbox" [checked]="hideNoneWarnings" />&nbsp;Danach filtern</label>
-                    }
-                </span>
-                <span class="value">{{warningCount}}</span>
-            </li>
+            <li class="empty"></li>
             <li [class.zerovalue]="internCount === 0">
                 <span class="name">Primärfälle (intern)</span>
                 <span class="value">{{internCount}}</span>
@@ -65,9 +57,40 @@
                 <span class="value">{{studyCount}}</span>
             </li>
         </ul>
+        <div>
+            <a class="xls button" href="./cases.xls?year={{year()}}">📊 Auswertung als Excel-Datei herunterladen</a>
+        </div>
+        <ul class="cols-4">
+            <li class= "warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
+                <span class="name">Kein Primärfall?
+                    @if (invalidPrimaerfallCount > 0) {
+                        &nbsp;-&nbsp;
+                        <label class="filter" title="Danach filtern"><input (change)="switchNonPFWarnings()" class="filter" type="checkbox" [checked]="hideNonePFWarnings" />&nbsp;Danach filtern</label>
+                    }
+                </span>
+                <span class="value">{{invalidPrimaerfallCount}}</span>
+            </li>
+            <li class= "warnings" [class.zerovalue]="warningCount === 0">
+                <span class="name">Doku prüfen!
+                    @if (warningCount > 0) {
+                        &nbsp;-&nbsp;
+                        <label class="filter" title="Danach filtern"><input (change)="switchNonWarnings()" class="filter" type="checkbox" [checked]="hideNoneWarnings" />&nbsp;Danach filtern</label>
+                    }
+                </span>
+                <span class="value">{{warningCount}}</span>
+            </li>
+            <li class="empty"></li>
+            <li class="empty"></li>
+        </ul>
     </div>
     <h2>
-        Primärfälle
+        @if (hideNoneWarnings) {
+            Primärfälle mit zu prüfender Dokumentation
+        } @else if (hideNonePFWarnings) {
+            Mögliche nicht zählbare Primärfälle
+        } @else {
+            Primärfälle
+        }
         &nbsp;
         <select (change)="onYearChangeEvent($event)">
             @for (y of years(); track y) {
@@ -84,6 +107,7 @@
                     <li>
                         <app-dashboard-entry
                                 (warningsChange)="updateWarningCount()"
+                                (invalidPrimaerfallChange)="updateInvalidPrimaerfallCount()"
                                 (internexternChange)="updateInternexternCount($event)"
                                 (offlabelCountChange)="updateOfflabelCount()"
                                 (studyCountChange)="updateStudyCount()"

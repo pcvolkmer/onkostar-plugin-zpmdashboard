@@ -10,11 +10,16 @@
             @if (data().zaehlzeitpunkt) {
                 <div>Zählzeitpunkt: <b>{{ data().zaehlzeitpunkt | date:'dd.MM.yyyy' }}</b></div>
             } @else {
-                <div>Zählzeitpunkt: <b>Nicht vorhanden</b></div>
+                <div>Zählzeitpunkt: <b>?</b></div>
+            }
+            @if (data().warningDetails.invalidPrimaerfall) {
+                <div class="check-nopf">
+                    💥 <b>Kein Primärfall?</b>
+                </div>
             }
             @if (data().warnings || loadingError) {
             <div class="check-required">
-                💥 <b>Achtung - Fall überprüfen!</b>
+                💥 <b>Doku überprüfen!</b>
             </div>
             }
             <div class="patient-link">
@@ -86,7 +91,7 @@
                     @if (data().latestDokuDatum) {
                         <div>{{ data().latestDokuDatum | date:'dd.MM.yyyy' }}</div>
                     } @else {
-                        <div>Keine Angabe</div>
+                        <div>Nicht feststellbar</div>
                     }
                 </div>
                 <div [class.success]="data().einschlussMvh" class="mvh-case">

@@ -16,12 +16,14 @@ export class App {
   protected year = signal<string>(new Date().getFullYear().toString());
 
   protected warningCount = 0;
+  protected invalidPrimaerfallCount = 0;
   protected internCount = 0;
   protected externCount = 0;
   protected offlabelCount = 0;
   protected studyCount = 0;
 
   protected hideNoneWarnings = false;
+  protected hideNonePFWarnings = false;
 
   constructor(readonly onkostarService: OnkostarService, readonly route: ActivatedRoute, readonly router: Router) {
     this.onkostarService = onkostarService;
@@ -57,8 +59,10 @@ export class App {
 
   protected loadData() {
     this.hideNoneWarnings = false;
+    this.hideNonePFWarnings = false;
 
     this.warningCount = 0;
+    this.invalidPrimaerfallCount = 0;
     this.internCount = 0;
     this.externCount = 0;
     this.offlabelCount = 0;
@@ -76,6 +80,10 @@ export class App {
 
   protected updateWarningCount() {
     this.warningCount++;
+  }
+
+  protected updateInvalidPrimaerfallCount() {
+    this.invalidPrimaerfallCount++;
   }
 
   protected updateInternexternCount(value: string | null) {
@@ -96,11 +104,29 @@ export class App {
 
   protected switchNonWarnings() {
     this.hideNoneWarnings = !this.hideNoneWarnings;
+    this.hideNonePFWarnings = false;
     if (this.hideNoneWarnings) {
       document.querySelectorAll('.dashboard-entry').forEach(elem => {
         (elem as HTMLElement).style.display = 'none';
       });
       document.querySelectorAll('.dashboard-entry:has(.check-required)').forEach(elem => {
+        (elem as HTMLElement).style.display = '';
+      });
+      return;
+    }
+    document.querySelectorAll('.dashboard-entry').forEach(elem => {
+      (elem as HTMLElement).style.display = '';
+    });
+  }
+
+  protected switchNonPFWarnings() {
+    this.hideNonePFWarnings = !this.hideNonePFWarnings;
+    this.hideNoneWarnings = false;
+    if (this.hideNonePFWarnings) {
+      document.querySelectorAll('.dashboard-entry').forEach(elem => {
+        (elem as HTMLElement).style.display = 'none';
+      });
+      document.querySelectorAll('.dashboard-entry:has(.check-nopf)').forEach(elem => {
         (elem as HTMLElement).style.display = '';
       });
       return;

@@ -20,14 +20,19 @@
 package dev.dnpm.zpmdashboard
 
 import de.itc.onkostar.api.IOnkostarApi
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.BorderStyle
+import org.apache.poi.ss.usermodel.Workbook
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
+import java.io.ByteArrayOutputStream
 import java.sql.Date
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
 import javax.sql.DataSource
+
 
 @Service
 class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: DataSource?) {
@@ -149,6 +154,11 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
                                 || !rs.getBoolean("sameyear")
                                 || !rs.getBoolean("zpm_erkrankung")
                                 || null == rs.getString("molgen_datum"),
+                        WarningDetails(
+                            hasPFWarnings(rs.getInt("erkrankung_id"), year),
+                            null == rs.getString("molgen_datum"),
+                            !rs.getBoolean("zpm_erkrankung")
+                        )
                     )
                 }
                 null
@@ -157,6 +167,86 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
             e.printStackTrace()
             return null
         }
+    }
+
+    fun casesXsl(year: Int): ByteArray {
+        val workbook: Workbook = HSSFWorkbook()
+        val sheet = workbook.createSheet("Primärfälle")
+
+        val headerFont = workbook.createFont()
+        headerFont.bold = true
+        val headerStyle = workbook.createCellStyle()
+        headerStyle.setFont(headerFont)
+        headerStyle.borderTop = BorderStyle.THIN
+        headerStyle.borderBottom = BorderStyle.THIN
+        headerStyle.borderLeft = BorderStyle.THIN
+        headerStyle.borderRight = BorderStyle.THIN
+
+        val cellStyle = workbook.createCellStyle()
+        cellStyle.borderTop = BorderStyle.THIN
+        cellStyle.borderBottom = BorderStyle.THIN
+        cellStyle.borderLeft = BorderStyle.THIN
+        cellStyle.borderRight = BorderStyle.THIN
+
+        val headers = listOf("PID", "ICD10", "Zählzeitpunkt", "Consent-Datum", "Consentzustimmung", "Warnung?", "Kein Primärfall?", "Kein MolGen?", "Keine Erkrankung?")
+        val headRow = sheet.createRow(0)
+        headers.forEachIndexed { idx, value ->
+            val cell = headRow.createCell(idx)
+            cell.setCellValue(value)
+            cell.cellStyle = headerStyle
+        }
+
+        this.findPrimaerfaelleCaseId(year)
+            .mapNotNull {
+                this.findCase(it.patientGuid, it.procedureGuid, year)
+            }
+            .forEachIndexed { row, case ->
+                val row = sheet.createRow(row + 1)
+
+                val pidCell  = row.createCell(0)
+                pidCell.setCellValue(case.pid.orEmpty())
+                pidCell.cellStyle = cellStyle
+
+                val icd10Cell  = row.createCell(1)
+                icd10Cell.setCellValue(case.icd.orEmpty())
+                icd10Cell.cellStyle = cellStyle
+
+                val zZeitpunktCell  = row.createCell(2)
+                zZeitpunktCell.setCellValue(case.zaehlzeitpunkt.orEmpty())
+                zZeitpunktCell.cellStyle = cellStyle
+
+                val consentCell = row.createCell(3)
+                consentCell.setCellValue(case.consent.datum.orEmpty())
+                consentCell.cellStyle = cellStyle
+
+                val consentAcceptedCell = row.createCell(4)
+                consentAcceptedCell.setCellValue(if (case.consent.zustimmung) { "Ja" } else { "Nein" })
+                consentAcceptedCell.cellStyle = cellStyle
+
+                val warningCell = row.createCell(5)
+                warningCell.setCellValue(if (case.warnings) { "Ja" } else { "Nein" })
+                warningCell.cellStyle = cellStyle
+
+                val keinPF = row.createCell(6)
+                keinPF.setCellValue(if (case.warningDetails?.invalidPrimaerfall == true) { "Ja" } else { "Nein" })
+                keinPF.cellStyle = cellStyle
+
+                val noMolGen = row.createCell(7)
+                noMolGen.setCellValue(if (case.warningDetails?.noMolgen == true) { "Ja" } else { "Nein" })
+                noMolGen.cellStyle = cellStyle
+
+                val noDisease = row.createCell(8)
+                noDisease.setCellValue(if (case.warningDetails?.noDisease == true) { "Ja" } else { "Nein" })
+                noDisease.cellStyle = cellStyle
+            }
+
+        headers.forEachIndexed { idx, _ -> sheet.autoSizeColumn(idx)}
+
+        val os = ByteArrayOutputStream()
+        workbook.write(os)
+        workbook.close()
+
+        return os.toByteArray()
     }
 
     private fun findMolPathConsent(patientGuid: String?): Consent {
@@ -225,6 +315,26 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         return jdbcTemplate.queryForObject(sql, params, Integer::class.java) > 1
     }
 
+    private fun hasPFWarnings(erkrankungId: Int, year: Int): Boolean {
+        val sql =
+            """SELECT DISTINCT YEAR(zpm.zaehlzeitpunkt) FROM dk_zpm_auswertungen zpm
+            JOIN prozedur p ON (zpm.id = p.id)
+            JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+            WHERE (YEAR(zpm.zaehlzeitpunkt) = :year OR YEAR(zpm.zaehlzeitpunkt) = :lastyear) 
+              AND ep.erkrankung_id = :erkrankung_id
+              AND p.geloescht <> 1 AND zpm.primaerfall = 1;
+        """.trimIndent()
+
+        val params = MapSqlParameterSource().apply {
+            addValue("year", year)
+            addValue("lastyear", year - 1)
+            addValue("erkrankung_id", erkrankungId)
+        }
+
+        // Multiple PF in this and last year
+        return jdbcTemplate.queryForList(sql, params, Integer::class.java).size > 1
+    }
+
     data class CaseId(
         val pid: String,
         val patientGuid: String,
@@ -247,7 +357,8 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
         var offlabel: Boolean,
         var studie: Boolean,
         var einschlussMvh: Boolean,
-        var warnings: Boolean = false
+        var warnings: Boolean = false,
+        var warningDetails: WarningDetails? = null
     )
 
     data class Consent(
@@ -258,5 +369,11 @@ class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: Dat
     data class MolGen(
         val datum: String?,
         val korrekt: Boolean = false
+    )
+
+    data class WarningDetails(
+        val invalidPrimaerfall: Boolean = false,
+        val noMolgen: Boolean = false,
+        val noDisease: Boolean = false
     )
 }

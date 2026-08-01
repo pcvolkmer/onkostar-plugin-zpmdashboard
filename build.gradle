@@ -39,6 +39,7 @@ dependencies {
     compileOnly "org.springframework:spring-webmvc:${springVersion}"
     compileOnly "org.springframework:spring-jdbc:${springVersion}"
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
+    compileOnly "org.apache.poi:poi-ooxml:5.2.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 

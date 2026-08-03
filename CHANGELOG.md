@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.11...v0.2.0) (2026-08-03)
+
+
+### Features
+
+* additional information in XLS file ([#49](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/49)) ([a1a3cc4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/a1a3cc412e1986941d1c54c569b706b688319355))
+* also check molgen date exists ([#42](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/42)) ([40263cc](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/40263ccc76bd820a0a40a07c79bf64b6099d2751))
+* also look into next year for MTB-Empfehlung ([b21d890](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/b21d8901ba236c823a701a01e945941aeb19a268))
+* filter cases that might not be a "Primärfall" ([#47](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/47)) ([65e05cd](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/65e05cde34bb249d2c40c6ba7b51ef35ec63f3ea))
+* if analysis fails, show error message ([#43](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/43)) ([a9a4d31](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/a9a4d317fa3dec23139dc4f1ab11fe6a98189372))
+* provide basic Excel analytics export ([#46](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/46)) ([244c436](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/244c436845443a9ab9c75822a0b21d41afe4f530))
+* select by equal mtb date and zpm date ([#44](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/44)) ([1f590f4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/1f590f425e3ed618ed8e847caf387e2b2dab8149))
+* switch off-label and study count ([#50](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/50)) ([71742ad](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/71742adb7bb424a157064d8e955718daae830b29))
+* use OpenXML XLSX format ([#51](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/51)) ([8b3e061](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/8b3e06101e05e3e851fb8daa73044288243aad83))
+* use year from query param ([#45](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/45)) ([f51e8f6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/f51e8f6ebe6961ecd7a60e5bc43bcfb6378f3ea7))
+
+
+### Miscellaneous Chores
+
+* release 0.2.0 ([fcf1dfc](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/fcf1dfc6822e3aa8a05623e5a280090016f4ec33))
+
 ## [0.1.11](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.10...v0.1.11) (2026-07-29)
 
 

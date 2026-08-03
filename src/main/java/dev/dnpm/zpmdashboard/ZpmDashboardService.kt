@@ -19,7 +19,6 @@
  */
 package dev.dnpm.zpmdashboard
 
-import de.itc.onkostar.api.IOnkostarApi
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.Workbook
@@ -35,7 +34,7 @@ import javax.sql.DataSource
 
 
 @Service
-class ZpmDashboardService(private val onkostarApi: IOnkostarApi, dataSource: DataSource?) {
+class ZpmDashboardService(dataSource: DataSource?) {
     private val jdbcTemplate: NamedParameterJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
     fun countMtbAnmeldungInYear(year: Int): Int {

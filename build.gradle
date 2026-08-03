@@ -25,6 +25,7 @@ ext {
     onkostarVersion = '2.14.0'
     springVersion = '4.3.8.RELEASE'
     slf4jVersion = '1.7.2'
+    junit4Version = '4.13.2'
     junitVersion = '5.14.3'
     junitPlatformVersion = '1.14.3'
     assertjVersion = '3.27.7'
@@ -43,15 +44,19 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
-    testCompileOnly "org.springframework:spring-test:${springVersion}"
-    testCompileOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-    testCompileOnly "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-    testCompileOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
-    testCompileOnly "org.assertj:assertj-core:${assertjVersion}"
-    testCompileOnly "org.mockito:mockito-core:${mockitoVersion}"
-    testCompileOnly "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-    testCompileOnly "ca.uhn.hapi:hapi-structures-v26:2.3"
-    testCompileOnly "org.hibernate:hibernate-core:4.3.11.Final"
+    testImplementation "org.springframework:spring-test:${springVersion}"
+    testImplementation "org.springframework:spring-context:${springVersion}"
+    testImplementation "org.springframework:spring-jdbc:${springVersion}"
+    testImplementation "com.h2database:h2:2.4.240"
+    testImplementation "junit:junit:${junit4Version}"
+    testImplementation "org.junit.vintage:junit-vintage-engine:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testImplementation "ca.uhn.hapi:hapi-structures-v26:2.3"
+    testImplementation "org.hibernate:hibernate-core:4.3.11.Final"
 }
 
 tasks.jar {

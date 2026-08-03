@@ -22,6 +22,8 @@ package dev.dnpm.zpmdashboard
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbookFactory
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -169,7 +171,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
     }
 
     fun casesXsl(year: Int): ByteArray {
-        val workbook: Workbook = HSSFWorkbook()
+        val workbook: Workbook = XSSFWorkbook()
         val sheet = workbook.createSheet("Primärfälle")
 
         val headerFont = workbook.createFont()

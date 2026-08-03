@@ -48,13 +48,13 @@
                 <span class="name">Primärfälle (extern)</span>
                 <span class="value">{{externCount}}</span>
             </li>
-            <li [class.zerovalue]="offlabelCount === 0">
-                <span class="name">Primärfälle (off-label)</span>
-                <span class="value">{{offlabelCount}}</span>
-            </li>
             <li [class.zerovalue]="studyCount === 0">
                 <span class="name">Primärfälle (Studie)</span>
                 <span class="value">{{studyCount}}</span>
+            </li>
+            <li [class.zerovalue]="offlabelCount === 0">
+                <span class="name">Primärfälle (off-label)</span>
+                <span class="value">{{offlabelCount}}</span>
             </li>
         </ul>
         <div>

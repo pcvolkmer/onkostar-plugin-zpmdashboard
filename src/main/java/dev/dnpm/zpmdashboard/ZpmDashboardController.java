@@ -87,13 +87,13 @@ public class ZpmDashboardController {
         return ResponseEntity.ok(cases);
     }
 
-    @GetMapping(value = "/zpm-dashboard/cases.xls")
+    @GetMapping(value = "/zpm-dashboard/cases.xlsx")
     public ResponseEntity<byte[]> getCasesXls(@RequestParam int year) {
         final var cases = this.zpmDashboardService.casesXsl(year);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=Primaerfaelle_%d.xls", year))
-                .contentType(MediaType.valueOf("application/vnd.ms-excel"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=Primaerfaelle_%d.xlsx", year))
+                .contentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(cases);
     }
 

@@ -189,7 +189,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         cellStyle.borderLeft = BorderStyle.THIN
         cellStyle.borderRight = BorderStyle.THIN
 
-        val headers = listOf("PID", "ICD10", "intern/extern", "Studie", "off-label", "Zählzeitpunkt", "Consent-Datum", "Consentzustimmung", "Warnung?", "Kein Primärfall?", "Kein MolGen?", "Keine Erkrankung?")
+        val headers = listOf("PID", "ICD10", "intern/extern", "Studie", "off-label", "Zählzeitpunkt", "Consent-Datum", "Consentzustimmung", "TuDok Stand", "Warnung?", "Kein Primärfall?", "Kein MolGen?", "Keine Erkrankung?")
         val headRow = sheet.createRow(0)
         headers.forEachIndexed { idx, value ->
             val cell = headRow.createCell(idx)
@@ -236,19 +236,23 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 consentAcceptedCell.setCellValue(if (case.consent.zustimmung) { "Ja" } else { "Nein" })
                 consentAcceptedCell.cellStyle = cellStyle
 
-                val warningCell = row.createCell(8)
+                val todokDateCell = row.createCell(8)
+                todokDateCell.setCellValue(case.latestDokuDatum.orEmpty())
+                todokDateCell.cellStyle = cellStyle
+
+                val warningCell = row.createCell(9)
                 warningCell.setCellValue(if (case.warnings) { "Ja" } else { "Nein" })
                 warningCell.cellStyle = cellStyle
 
-                val keinPF = row.createCell(9)
+                val keinPF = row.createCell(10)
                 keinPF.setCellValue(if (case.warningDetails?.invalidPrimaerfall == true) { "Ja" } else { "Nein" })
                 keinPF.cellStyle = cellStyle
 
-                val noMolGen = row.createCell(10)
+                val noMolGen = row.createCell(11)
                 noMolGen.setCellValue(if (case.warningDetails?.noMolgen == true) { "Ja" } else { "Nein" })
                 noMolGen.cellStyle = cellStyle
 
-                val noDisease = row.createCell(11)
+                val noDisease = row.createCell(12)
                 noDisease.setCellValue(if (case.warningDetails?.noDisease == true) { "Ja" } else { "Nein" })
                 noDisease.cellStyle = cellStyle
             }

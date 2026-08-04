@@ -19,11 +19,9 @@
  */
 package dev.dnpm.zpmdashboard
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbookFactory
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -32,6 +30,7 @@ import java.io.ByteArrayOutputStream
 import java.sql.Date
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import javax.sql.DataSource
 
 
@@ -102,7 +101,14 @@ class ZpmDashboardService(dataSource: DataSource?) {
         return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
             val caseIds = mutableListOf<CaseId>()
             while (rs!!.next()) {
-                caseIds.add(CaseId(rs.getString("patienten_id"), rs.getString("pat_guid"), rs.getString("proc_guid"), rs.getString("e_guid").orEmpty()))
+                caseIds.add(
+                    CaseId(
+                        rs.getString("patienten_id"),
+                        rs.getString("pat_guid"),
+                        rs.getString("proc_guid"),
+                        rs.getString("e_guid").orEmpty()
+                    )
+                )
             }
             return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
         })
@@ -189,7 +195,29 @@ class ZpmDashboardService(dataSource: DataSource?) {
         cellStyle.borderLeft = BorderStyle.THIN
         cellStyle.borderRight = BorderStyle.THIN
 
-        val headers = listOf("PID", "ICD10", "intern/extern", "Studie", "off-label", "Zählzeitpunkt", "Consent-Datum", "Consentzustimmung", "TuDok Stand", "Warnung?", "Kein Primärfall?", "Kein MolGen?", "Keine Erkrankung?")
+        val dateStyle = workbook.createCellStyle()
+        dateStyle.borderTop = BorderStyle.THIN
+        dateStyle.borderBottom = BorderStyle.THIN
+        dateStyle.borderLeft = BorderStyle.THIN
+        dateStyle.borderRight = BorderStyle.THIN
+        val createHelper = workbook.creationHelper
+        dateStyle.dataFormat = createHelper.createDataFormat().getFormat("dd.MM.yyyy")
+
+        val headers = listOf(
+            "PID",
+            "ICD10",
+            "intern/extern",
+            "Studie",
+            "off-label",
+            "Zählzeitpunkt",
+            "Consent-Datum",
+            "Consentzustimmung",
+            "TuDok Stand",
+            "Warnung?",
+            "Kein Primärfall?",
+            "Kein MolGen?",
+            "Keine Erkrankung?"
+        )
         val headRow = sheet.createRow(0)
         headers.forEachIndexed { idx, value ->
             val cell = headRow.createCell(idx)
@@ -204,60 +232,120 @@ class ZpmDashboardService(dataSource: DataSource?) {
             .forEachIndexed { row, case ->
                 val row = sheet.createRow(row + 1)
 
-                val pidCell  = row.createCell(0)
+                val pidCell = row.createCell(0)
                 pidCell.setCellValue(case.pid.orEmpty())
                 pidCell.cellStyle = cellStyle
 
-                val icd10Cell  = row.createCell(1)
+                val icd10Cell = row.createCell(1)
                 icd10Cell.setCellValue(case.icd.orEmpty())
                 icd10Cell.cellStyle = cellStyle
 
-                val internExternColumn  = row.createCell(2)
-                internExternColumn.setCellValue(if (case.internextern == "E") { "extern" } else { "intern" })
+                val internExternColumn = row.createCell(2)
+                internExternColumn.setCellValue(
+                    if (case.internextern == "E") {
+                        "extern"
+                    } else {
+                        "intern"
+                    }
+                )
                 internExternColumn.cellStyle = cellStyle
 
-                val studieColumn  = row.createCell(3)
-                studieColumn.setCellValue(if (case.studie) { "Ja" } else { "Nein" })
+                val studieColumn = row.createCell(3)
+                studieColumn.setCellValue(
+                    if (case.studie) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 studieColumn.cellStyle = cellStyle
 
-                val offLabelColumn  = row.createCell(4)
-                offLabelColumn.setCellValue(if (case.offlabel) { "Ja" } else { "Nein" })
+                val offLabelColumn = row.createCell(4)
+                offLabelColumn.setCellValue(
+                    if (case.offlabel) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 offLabelColumn.cellStyle = cellStyle
 
-                val zZeitpunktCell  = row.createCell(5)
-                zZeitpunktCell.setCellValue(case.zaehlzeitpunkt.orEmpty())
-                zZeitpunktCell.cellStyle = cellStyle
+                val zZeitpunktCell = row.createCell(5)
+                try {
+                    val date = LocalDate.parse(case.zaehlzeitpunkt.orEmpty())
+                    zZeitpunktCell.setCellValue(Date.valueOf(date))
+                } catch (_: Exception) { /* Do not set a value */
+                }
+                zZeitpunktCell.cellStyle = dateStyle
 
                 val consentCell = row.createCell(6)
-                consentCell.setCellValue(case.consent.datum.orEmpty())
-                consentCell.cellStyle = cellStyle
+                try {
+                    val date = LocalDate.parse(case.consent.datum.orEmpty())
+                    consentCell.setCellValue(Date.valueOf(date))
+                } catch (_: Exception) { /* Do not set a value */
+                }
+                consentCell.cellStyle = dateStyle
 
                 val consentAcceptedCell = row.createCell(7)
-                consentAcceptedCell.setCellValue(if (case.consent.zustimmung) { "Ja" } else { "Nein" })
+                consentAcceptedCell.setCellValue(
+                    if (case.consent.zustimmung) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 consentAcceptedCell.cellStyle = cellStyle
 
                 val todokDateCell = row.createCell(8)
-                todokDateCell.setCellValue(case.latestDokuDatum.orEmpty())
-                todokDateCell.cellStyle = cellStyle
+                try {
+                    val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
+                    consentCell.setCellValue(Date.valueOf(date))
+                } catch (_: Exception) { /* Do not set a value */
+                }
+                todokDateCell.cellStyle = dateStyle
 
                 val warningCell = row.createCell(9)
-                warningCell.setCellValue(if (case.warnings) { "Ja" } else { "Nein" })
+                warningCell.setCellValue(
+                    if (case.warnings) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 warningCell.cellStyle = cellStyle
 
                 val keinPF = row.createCell(10)
-                keinPF.setCellValue(if (case.warningDetails?.invalidPrimaerfall == true) { "Ja" } else { "Nein" })
+                keinPF.setCellValue(
+                    if (case.warningDetails?.invalidPrimaerfall == true) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 keinPF.cellStyle = cellStyle
 
                 val noMolGen = row.createCell(11)
-                noMolGen.setCellValue(if (case.warningDetails?.noMolgen == true) { "Ja" } else { "Nein" })
+                noMolGen.setCellValue(
+                    if (case.warningDetails?.noMolgen == true) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 noMolGen.cellStyle = cellStyle
 
                 val noDisease = row.createCell(12)
-                noDisease.setCellValue(if (case.warningDetails?.noDisease == true) { "Ja" } else { "Nein" })
+                noDisease.setCellValue(
+                    if (case.warningDetails?.noDisease == true) {
+                        "Ja"
+                    } else {
+                        "Nein"
+                    }
+                )
                 noDisease.cellStyle = cellStyle
             }
 
-        headers.forEachIndexed { idx, _ -> sheet.autoSizeColumn(idx)}
+        headers.forEachIndexed { idx, _ -> sheet.autoSizeColumn(idx) }
 
         val os = ByteArrayOutputStream()
         workbook.write(os)

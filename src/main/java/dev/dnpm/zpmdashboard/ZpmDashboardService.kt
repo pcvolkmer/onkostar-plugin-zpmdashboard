@@ -20,6 +20,8 @@
 package dev.dnpm.zpmdashboard
 
 import org.apache.poi.ss.usermodel.BorderStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.jdbc.core.ResultSetExtractor
@@ -30,6 +32,8 @@ import java.io.ByteArrayOutputStream
 import java.sql.Date
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 import javax.sql.DataSource
 
@@ -178,7 +182,12 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun casesXsl(year: Int): ByteArray {
         val workbook: Workbook = XSSFWorkbook()
-        val sheet = workbook.createSheet("Primärfälle")
+        val sheet = workbook.createSheet(
+            "Primärfälle - Stand %s".format(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm"))
+            )
+        )
+        sheet.createFreezePane(2, 1)
 
         val headerFont = workbook.createFont()
         headerFont.bold = true
@@ -188,6 +197,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
         headerStyle.borderBottom = BorderStyle.THIN
         headerStyle.borderLeft = BorderStyle.THIN
         headerStyle.borderRight = BorderStyle.THIN
+        headerStyle.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        headerStyle.fillPattern = FillPatternType.SOLID_FOREGROUND
 
         val cellStyle = workbook.createCellStyle()
         cellStyle.borderTop = BorderStyle.THIN

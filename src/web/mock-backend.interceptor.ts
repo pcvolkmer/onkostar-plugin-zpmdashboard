@@ -72,7 +72,15 @@ export class MockBackendInterceptor implements HttpInterceptor {
                   invalidPrimaerfall: parseInt(guid[1]) % 2 == 1,
                   noMolgen: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,
                   noDisease: false,
-              }
+              },
+              aufgaben: parseInt(guid[1]) % 2 == 1 ? [
+                  {
+                      akteur: "Akteur",
+                      date: "2025-01-01",
+                      text: "Aufgabe",
+                      dueDate: "2025-01-01"
+                  }
+              ] : []
       };
 
       return of(new HttpResponse({

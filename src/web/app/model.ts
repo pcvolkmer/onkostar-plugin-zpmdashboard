@@ -51,6 +51,7 @@ export class CaseModel {
   public einschlussMvh: boolean;
   public warnings: boolean;
   public warningDetails: WarningDetails;
+  public aufgaben: Aufgabe[];
 
   constructor() {
     this.pid = "";
@@ -69,6 +70,7 @@ export class CaseModel {
     this.einschlussMvh = false;
     this.warnings = false;
     this.warningDetails = new WarningDetails();
+    this.aufgaben = [];
   }
 }
 
@@ -101,6 +103,28 @@ export class WarningDetails {
     this.invalidPrimaerfall = false;
     this.noMolgen = false;
     this.noDisease = false;
+  }
+}
+
+export class Aufgabe {
+  public akteur: string;
+  public date: string;
+  public diseaseGuid: string;
+  public formName: string | null;
+  public formDate: string | null;
+  public formGuid: string | null;
+  public text: string;
+  public dueDate: string | null;
+
+  constructor() {
+    this.akteur = "";
+    this.date = "";
+    this.diseaseGuid = "";
+    this.formName = null;
+    this.formDate = null;
+    this.formGuid = null;
+    this.text = "";
+    this.dueDate = null;
   }
 }
 

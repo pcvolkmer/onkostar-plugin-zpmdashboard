@@ -61,7 +61,7 @@
             <a class="xls button" href="./cases.xlsx?year={{year()}}">📊 Auswertung als Excel-Datei herunterladen</a>
         </div>
         <ul class="cols-4">
-            <li class= "warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
+            <li class="warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
                 <span class="name">Kein Primärfall?
                     @if (invalidPrimaerfallCount > 0) {
                         &nbsp;-&nbsp;
@@ -70,7 +70,7 @@
                 </span>
                 <span class="value">{{invalidPrimaerfallCount}}</span>
             </li>
-            <li class= "warnings" [class.zerovalue]="warningCount === 0">
+            <li class="warnings" [class.zerovalue]="warningCount === 0">
                 <span class="name">Doku prüfen!
                     @if (warningCount > 0) {
                         &nbsp;-&nbsp;
@@ -79,7 +79,15 @@
                 </span>
                 <span class="value">{{warningCount}}</span>
             </li>
-            <li class="empty"></li>
+            <li class="warnings" [class.zerovalue]="taskCount === 0">
+                <span class="name">Mit offenen Aufgaben
+                    @if (taskCount > 0) {
+                        &nbsp;-&nbsp;
+                        <label class="filter" title="Danach filtern"><input (change)="switchNonTasks()" class="filter" type="checkbox" [checked]="hideNoneTasks" />&nbsp;Danach filtern</label>
+                    }
+                </span>
+                <span class="value">{{taskCount}}</span>
+            </li>
             <li class="empty"></li>
         </ul>
     </div>
@@ -111,6 +119,7 @@
                                 (internexternChange)="updateInternexternCount($event)"
                                 (offlabelCountChange)="updateOfflabelCount()"
                                 (studyCountChange)="updateStudyCount()"
+                                (taskCountChange)="updateTaskCount()"
                                 [pid]="caseId.pid"
                                 [patientGuid]="caseId.patientGuid"
                                 [procedureGuid]="caseId.procedureGuid"

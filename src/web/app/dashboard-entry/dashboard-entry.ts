@@ -18,6 +18,7 @@ export class DashboardEntry implements OnInit {
   @Input() year!: string;
 
   protected loadingError = false;
+  protected showAufgaben = false;
   protected data = signal<CaseModel>(new CaseModel());
 
   public warningsChange = output();
@@ -25,6 +26,7 @@ export class DashboardEntry implements OnInit {
   public internexternChange = output<string | null>();
   public offlabelCountChange = output();
   public studyCountChange = output();
+  public taskCountChange = output();
 
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
@@ -59,6 +61,9 @@ export class DashboardEntry implements OnInit {
       }
       if (res.studie) {
         this.studyCountChange.emit();
+      }
+      if (res.aufgaben.length > 0) {
+        this.taskCountChange.emit();
       }
     });
   }

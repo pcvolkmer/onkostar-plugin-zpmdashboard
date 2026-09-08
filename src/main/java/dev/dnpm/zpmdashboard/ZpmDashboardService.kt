@@ -32,9 +32,9 @@ import java.io.ByteArrayOutputStream
 import java.sql.Date
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.LocalDate
 import javax.sql.DataSource
 
 
@@ -169,7 +169,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
                             hasPFWarnings(rs.getInt("erkrankung_id"), year),
                             null == rs.getString("molgen_datum"),
                             !rs.getBoolean("zpm_erkrankung")
-                        )
+                        ),
+                        findAufgabenForPatient(patientGuid)
                     )
                 }
                 null
@@ -178,6 +179,51 @@ class ZpmDashboardService(dataSource: DataSource?) {
             e.printStackTrace()
             return null
         }
+    }
+
+    fun findAufgabenForPatient(patientGuid: String): List<Aufgabe> {
+        val sql = """SELECT
+            CONCAT(akteur.name, ', ',akteur.vorname) AS user,
+            data_form.name AS form_name,
+            prozedur.beginndatum AS form_date,
+            prozedur.guid AS form_guid,
+            aufnahme_akteur_zeit,
+            hinweis,
+            faelligkeit
+            FROM aufgabe
+            JOIN aufgabenliste ON (aufgabe.aufgabenliste_id = aufgabenliste.id AND aufgabenliste.name = 'ZPM-Dashboard')
+            JOIN akteur ON (aufgabe.aufnahme_akteur_id = akteur.id)
+            JOIN patient ON (patient.id = aufgabe.patient_id)
+            LEFT JOIN prozedur ON (prozedur.id = aufgabe.prozedur_id)
+            LEFT JOIN data_form ON (data_form.id = prozedur.data_form_id)
+            WHERE aufgabe.status < 1 AND patient.guid = :pat_guid;"""
+
+        try {
+            val params = MapSqlParameterSource().apply {
+                addValue("pat_guid", patientGuid)
+            }
+
+            return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
+                val result = mutableListOf<Aufgabe>()
+                while (rs.next()) {
+                    result.add(
+                        Aufgabe(
+                            rs.getString("user"),
+                            rs.getString("aufnahme_akteur_zeit"),
+                            rs.getString("hinweis"),
+                            rs.getString("faelligkeit"),
+                            rs.getString("form_name"),
+                            rs.getString("form_date"),
+                            rs.getString("form_guid")
+                        )
+                    )
+                }
+                return@ResultSetExtractor result
+            })
+        } catch (_: Exception) {
+            // Nop
+        }
+        return emptyList()
     }
 
     fun casesXsl(year: Int): ByteArray {
@@ -474,7 +520,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
         var studie: Boolean,
         var einschlussMvh: Boolean,
         var warnings: Boolean = false,
-        var warningDetails: WarningDetails? = null
+        var warningDetails: WarningDetails? = null,
+        val aufgaben: List<Aufgabe> = emptyList()
     )
 
     data class Consent(
@@ -491,5 +538,15 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val invalidPrimaerfall: Boolean = false,
         val noMolgen: Boolean = false,
         val noDisease: Boolean = false
+    )
+
+    data class Aufgabe(
+        val akteur: String,
+        val date: String,
+        val text: String,
+        val dueDate: String?,
+        val formName: String?,
+        val formDate: String?,
+        val formGuid: String?
     )
 }

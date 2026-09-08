@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.0...v0.2.1) (2026-08-04)
+
+
+### Features
+
+* add latest TuDok date ([#52](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/52)) ([215cbc1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/215cbc1c5549607d1897ad011dfb324149a5e862))
+* fix headline and PID/ICD column ([#55](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/55)) ([b86f8c5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/b86f8c58beb4ba8967632b183849e8e934bacde8))
+* use dateformat dd.MM.yyyy ([#54](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/54)) ([dec224b](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/dec224b14fa4128c5b88bf303f4c60733255c4da))
+
 ## [0.2.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.1.11...v0.2.0) (2026-08-03)
 
 

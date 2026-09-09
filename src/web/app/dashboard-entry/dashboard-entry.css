@@ -71,3 +71,30 @@
 .dashboard-entry .check-required {
     @apply text-red-800 uppercase;
 }
+
+.dashboard-entry .aufgaben {
+    @apply ml-8
+}
+
+.dashboard-entry a.aufgabe-button {
+    @apply cursor-pointer;
+    background-color: var(--color-primary);
+}
+
+.dashboard-entry .aufgabe {
+    @apply p-2 m-0.5 rounded text-slate-900 bg-white border px-2 border-slate-400
+}
+
+.dashboard-entry .aufgabe > h4 {
+    @apply font-bold text-lg;
+    color: var(--color-primary);
+}
+
+.dashboard-entry .due {
+    @apply text-red-900 font-bold
+}
+
+.dashboard-entry p {
+    @apply font-mono my-4 py-4 border-y border-slate-400 border-dashed
+}
+

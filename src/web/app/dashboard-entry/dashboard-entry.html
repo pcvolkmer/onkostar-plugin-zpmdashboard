@@ -25,6 +25,11 @@
             <div class="patient-link">
                 <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten in Onkostar</a>
             </div>
+            @if (data().aufgaben.length > 0) {
+            <div class="check-tasks">
+                <a class="button aufgabe-button" (click)="showAufgaben = !showAufgaben">🧪 {{ data().aufgaben.length }} Aufgabe(n)</a>
+            </div>
+            }
         </div>
         @if (loadingError) {
             <div class="details">
@@ -103,6 +108,29 @@
                     }
                 </div>
             </div>
+            @if (showAufgaben) {
+            <div class="aufgaben">
+                @for (aufgabe of data().aufgaben; track aufgabe) {
+                    <div class="aufgabe">
+                        <h4>🧪 Aufgabe</h4>
+                        <div>Erstellt von <b>{{aufgabe.akteur}}</b> am <b>{{ aufgabe.date | date:'dd.MM.yyyy' }}</b></div>
+                        @if (aufgabe.dueDate) {
+                            <div class="due">Fällig am: {{ aufgabe.dueDate | date:'dd.MM.yyyy' }}</div>
+                        }
+                        <p>{{aufgabe.text}}</p>
+                        @if (aufgabe.formGuid) {
+                            <a class="button" href="/onkostar/index.html?procedureId={{ aufgabe.formGuid }}" target="_blank">
+                                Zum Formular {{ aufgabe.formName }} ({{ aufgabe.formDate | date:'dd.MM.yyyy' }})
+                            </a>
+                        } @else {
+                            <a class="button" href="/onkostar/index.html?patientId={{ data().patientGuid }}" target="_blank">
+                                Zum Patienten
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+            }
         }
     } @else {
         <div class="header header-loading">

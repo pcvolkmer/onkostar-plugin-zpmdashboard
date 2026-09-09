@@ -356,7 +356,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 val todokDateCell = row.createCell(8)
                 try {
                     val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
-                    consentCell.setCellValue(Date.valueOf(date))
+                    todokDateCell.setCellValue(Date.valueOf(date))
                 } catch (_: Exception) { /* Do not set a value */
                 }
                 todokDateCell.cellStyle = dateStyle

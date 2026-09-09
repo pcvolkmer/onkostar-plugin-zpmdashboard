@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.1...v0.2.2) (2026-09-09)
+
+
+### Features
+
+* add initial task list support ([#57](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/57)) ([c947165](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/c947165da529eb8fcbb4bbff79853f1be6d65e87))
+
+
+### Bug Fixes
+
+* excel export of latest tudock date ([#59](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/59)) ([3bcc220](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/3bcc220999f2732900d6bf79c0b4d2e0c99bd116))
+
 ## [0.2.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.0...v0.2.1) (2026-08-04)
 
 

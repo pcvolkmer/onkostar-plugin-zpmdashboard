@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.2...v0.2.3) (2026-09-10)
+
+
+### Features
+
+* find matching einsendummer in different formats ([#60](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/60)) ([db6f540](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/db6f540eea2321c3f1e9af90418f6778f0b3db81))
+
 ## [0.2.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.1...v0.2.2) (2026-09-09)
 
 

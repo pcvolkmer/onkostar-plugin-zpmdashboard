@@ -120,7 +120,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
@@ -155,7 +155,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("anmeldedatum"),
                         rs.getString("internextern"),
                         findMolPathConsent(patientGuid),
-                        MolGen(rs.getString("molgen_datum"), rs.getBoolean("molgen_korrekt")),
+                        findMolGen(patientGuid, Einsendenummer(rs.getString("einsendenummer"))),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
                         rs.getBoolean("offlabel"),
@@ -179,6 +179,37 @@ class ZpmDashboardService(dataSource: DataSource?) {
             e.printStackTrace()
             return null
         }
+    }
+
+    fun findMolGen(patientGuid: String, einsendenummer: Einsendenummer): MolGen {
+        val sql = """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status FROM patient
+            JOIN prozedur ON (prozedur.patient_id = patient.id)
+            JOIN dk_molekulargenetik ON (dk_molekulargenetik.id = prozedur.id)
+            JOIN data_form ON (data_form.id = prozedur.data_form_id)
+            WHERE data_form.name = 'OS.Molekulargenetik' AND prozedur.geloescht <> 1 AND patient.guid = :pat_guid"""
+
+        try {
+            val params = MapSqlParameterSource().apply {
+                addValue("pat_guid", patientGuid)
+            }
+
+            val results = mutableListOf<MolGen>()
+            jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
+                while (rs.next()) {
+                    val molGen = MolGen(rs.getString("beginndatum"), rs.getBoolean("status"))
+                    if (einsendenummer.matches(Einsendenummer(rs.getString("einsendenummer")))) {
+                        results.add(molGen)
+                    }
+                }
+            })
+            if (results.isNotEmpty()) {
+                return results[0]
+            }
+        } catch (_: Exception) {
+            // Nop
+        }
+
+        return MolGen(null, false)
     }
 
     fun findAufgabenForPatient(patientGuid: String): List<Aufgabe> {

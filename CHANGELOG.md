@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.3...v0.2.4) (2026-09-10)
+
+
+### Bug Fixes
+
+* MolGen status ([b291569](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/b291569b2b901b7566aea323efb38b1e4d100841))
+
 ## [0.2.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.2...v0.2.3) (2026-09-10)
 
 

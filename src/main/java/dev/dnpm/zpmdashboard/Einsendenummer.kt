@@ -10,7 +10,7 @@ class Einsendenummer(private val value: String?) {
             return false
         }
 
-        return this.normalized() == other.normalized()
+        return this.value == other.value || this.normalized() == other.normalized()
     }
 
     fun normalized(): String? {

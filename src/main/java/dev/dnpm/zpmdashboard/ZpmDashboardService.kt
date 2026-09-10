@@ -182,7 +182,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
     }
 
     fun findMolGen(patientGuid: String, einsendenummer: Einsendenummer): MolGen {
-        val sql = """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status FROM patient
+        val sql = """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status = 0 AS korrekt FROM patient
             JOIN prozedur ON (prozedur.patient_id = patient.id)
             JOIN dk_molekulargenetik ON (dk_molekulargenetik.id = prozedur.id)
             JOIN data_form ON (data_form.id = prozedur.data_form_id)
@@ -196,7 +196,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             val results = mutableListOf<MolGen>()
             jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
                 while (rs.next()) {
-                    val molGen = MolGen(rs.getString("beginndatum"), rs.getBoolean("status"))
+                    val molGen = MolGen(rs.getString("beginndatum"), rs.getBoolean("korrekt"))
                     if (einsendenummer.matches(Einsendenummer(rs.getString("einsendenummer")))) {
                         results.add(molGen)
                     }

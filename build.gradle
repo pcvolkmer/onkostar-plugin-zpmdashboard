@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'dev.dnpm'
-version = '0.2.4' // x-release-please-version
+version = '0.2.5' // x-release-please-version
 description = 'ZPM Dashbord UKGM'
 
 java.sourceCompatibility = JavaVersion.VERSION_11

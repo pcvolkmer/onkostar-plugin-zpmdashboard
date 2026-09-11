@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.4...v0.2.5) (2026-09-11)
+
+
+### Features
+
+* blank einsendenummer ([698bd7d](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/698bd7d92ea19db4bec78402c66be9a3bee4d5c7))
+
 ## [0.2.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.3...v0.2.4) (2026-09-10)
 
 

@@ -155,7 +155,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("anmeldedatum"),
                         rs.getString("internextern"),
                         findMolPathConsent(patientGuid),
-                        findMolGen(patientGuid, Einsendenummer(rs.getString("einsendenummer"))),
+                        findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer"))),
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
                         rs.getBoolean("offlabel"),
@@ -181,16 +181,16 @@ class ZpmDashboardService(dataSource: DataSource?) {
         }
     }
 
-    fun findMolGen(patientGuid: String, einsendenummer: Einsendenummer): MolGen {
+    fun findMolGen(pid: String, einsendenummer: Einsendenummer): MolGen {
         val sql = """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status = 0 AS korrekt FROM patient
             JOIN prozedur ON (prozedur.patient_id = patient.id)
             JOIN dk_molekulargenetik ON (dk_molekulargenetik.id = prozedur.id)
             JOIN data_form ON (data_form.id = prozedur.data_form_id)
-            WHERE data_form.name = 'OS.Molekulargenetik' AND prozedur.geloescht <> 1 AND patient.guid = :pat_guid"""
+            WHERE data_form.name = 'OS.Molekulargenetik' AND prozedur.geloescht <> 1 AND patient.patienten_id = :pid"""
 
         try {
             val params = MapSqlParameterSource().apply {
-                addValue("pat_guid", patientGuid)
+                addValue("pid", pid)
             }
 
             val results = mutableListOf<MolGen>()

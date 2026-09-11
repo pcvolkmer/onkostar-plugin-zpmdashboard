@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.5...v0.2.6) (2026-09-11)
+
+
+### Features
+
+* use PID to fetch OS.Molekulargenetik ([#64](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/64)) ([ca5c099](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/ca5c099786e542f345ff818bbd45fa3b6ffb2a45))
+
 ## [0.2.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.4...v0.2.5) (2026-09-11)
 
 

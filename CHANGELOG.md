@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.6...v0.2.7) (2026-09-11)
+
+
+### Features
+
+* accept Einsendenummer starting with "NXP_" ([#66](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/66)) ([d09cddd](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d09cdddb19afadb52351ee0f9c6b2372d30604e5))
+
 ## [0.2.6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.5...v0.2.6) (2026-09-11)
 
 

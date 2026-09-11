@@ -36,6 +36,10 @@ class EinsendenummerTest {
         ).isTrue()
 
         assertThat(
+            Einsendenummer("NXP_A/20/123.100").matches(Einsendenummer("A/2020/123"))
+        ).isTrue()
+
+        assertThat(
             Einsendenummer(null).matches(Einsendenummer(null))
         ).isFalse
 

@@ -26,10 +26,10 @@ class Einsendenummer(private val value: String?) {
             return null
         }
 
-        val pattern1 = Pattern.compile("^(?<prefix>[A-Z])/(\\d{2})?(?<year>\\d{2})/0*(?<number>\\d+)")
+        val pattern1 = Pattern.compile("^(NXP_)?(?<prefix>[A-Z])/(\\d{2})?(?<year>\\d{2})/0*(?<number>\\d+)")
         val matcher1 = pattern1.matcher(value.trim())
 
-        val pattern2 = Pattern.compile("^(?<prefix>[A-Z])\\s*0*(?<number>\\d+)[\\-/](?<year>\\d{2})")
+        val pattern2 = Pattern.compile("^(NXP_)?(?<prefix>[A-Z])\\s*0*(?<number>\\d+)[\\-/](?<year>\\d{2})")
         val matcher2 = pattern2.matcher(value.trim())
 
         if (matcher1.find()) {

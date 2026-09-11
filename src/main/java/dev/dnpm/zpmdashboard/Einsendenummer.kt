@@ -10,7 +10,7 @@ class Einsendenummer(private val value: String?) {
             return false
         }
 
-        return this.value == other.value || this.normalized() == other.normalized()
+        return this.value?.trim() == other.value?.trim() || this.normalized() == other.normalized()
     }
 
     fun normalized(): String? {
@@ -22,15 +22,15 @@ class Einsendenummer(private val value: String?) {
             return String.format("%s/%s/%s", prefix, year, number)
         }
 
-        if (null == value) {
+        if (value.isNullOrBlank()) {
             return null
         }
 
-        val pattern1 = Pattern.compile("(?<prefix>[A-Z])/(\\d{2})?(?<year>\\d{2})/0*(?<number>\\d+)")
-        val matcher1 = pattern1.matcher(value)
+        val pattern1 = Pattern.compile("^(?<prefix>[A-Z])/(\\d{2})?(?<year>\\d{2})/0*(?<number>\\d+)")
+        val matcher1 = pattern1.matcher(value.trim())
 
-        val pattern2 = Pattern.compile("(?<prefix>[A-Z])\\s*0*(?<number>\\d+)[\\-/](?<year>\\d{2})")
-        val matcher2 = pattern2.matcher(value)
+        val pattern2 = Pattern.compile("^(?<prefix>[A-Z])\\s*0*(?<number>\\d+)[\\-/](?<year>\\d{2})")
+        val matcher2 = pattern2.matcher(value.trim())
 
         if (matcher1.find()) {
             return keyFromMatcher(matcher1)

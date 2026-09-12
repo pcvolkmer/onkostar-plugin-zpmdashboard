@@ -120,14 +120,12 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, molgen.datum AS molgen_datum, molgenp.status = 0 AS molgen_korrekt, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
                     JOIN prozedur zpmp ON (zpmp.id = zpm.id) 
                     LEFT JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
-                    LEFT JOIN dk_molekulargenetik molgen ON (e.einsendenummer = molgen.einsendenummer) 
-                    LEFT JOIN prozedur molgenp ON (molgen.id = molgenp.id) 
                     LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
                     WHERE p.geloescht <> 1 
@@ -146,6 +144,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
             return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
                 if (rs.next()) {
+                    val molgen = findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer")))
+
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
                         rs.getString("icd10"),
@@ -155,7 +155,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("anmeldedatum"),
                         rs.getString("internextern"),
                         findMolPathConsent(patientGuid),
-                        findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer"))),
+                        molgen,
                         rs.getString("mtbdatum"),
                         findLatestDokuDatum(rs.getInt("erkrankung_id")),
                         rs.getBoolean("offlabel"),
@@ -164,10 +164,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         hasWarnings(rs.getInt("erkrankung_id"), year)
                                 || !rs.getBoolean("sameyear")
                                 || !rs.getBoolean("zpm_erkrankung")
-                                || null == rs.getString("molgen_datum"),
+                                || null == molgen.datum,
                         WarningDetails(
                             hasPFWarnings(rs.getInt("erkrankung_id"), year),
-                            null == rs.getString("molgen_datum"),
+                            null == molgen.datum,
                             !rs.getBoolean("zpm_erkrankung")
                         ),
                         findAufgabenForPatient(patientGuid)

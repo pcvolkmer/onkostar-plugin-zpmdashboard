@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.8](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.7...v0.2.8) (2026-09-12)
+
+
+### Features
+
+* cleanup molgen analysis ([#68](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/68)) ([53e2986](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/53e298663fb73c380f40567a1df45699f4710376))
+
 ## [0.2.7](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.6...v0.2.7) (2026-09-11)
 
 

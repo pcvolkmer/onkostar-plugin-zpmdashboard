@@ -2,6 +2,8 @@ package dev.dnpm.zpmdashboard
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.stream.Stream
+import kotlin.streams.toList
 
 class Einsendenummer(private val value: String?) {
 
@@ -13,13 +15,19 @@ class Einsendenummer(private val value: String?) {
         return this.value?.trim() == other.value?.trim() || this.normalized() == other.normalized()
     }
 
+    fun partialMatches(other: Einsendenummer): Boolean {
+        return this.splitContained().any { self ->
+            other.splitContained().any { other -> self.normalized()?.contains(other.normalized()!!) ?: false }
+        }
+    }
+
     fun normalized(): String? {
         fun keyFromMatcher(matcher: Matcher): String {
             val prefix = matcher.group("prefix")
             val year = matcher.group("year")
             val number = matcher.group("number")
 
-            return String.format("%s/%s/%s", prefix, year, number)
+            return String.format("%s/20%s/%s", prefix, year, number)
         }
 
         if (value.isNullOrBlank()) {
@@ -41,5 +49,18 @@ class Einsendenummer(private val value: String?) {
         }
     }
 
+    fun splitContained(): List<Einsendenummer> {
+        if (value.isNullOrBlank()) {
+            return emptyList()
+        }
+
+        val pattern1 = Pattern.compile("(NXP_)?(?<prefix>[A-Z])/(\\d{2})?(?<year>\\d{2})/0*(?<number>\\d+)")
+        val matcher1 = pattern1.matcher(value.trim())
+
+        val pattern2 = Pattern.compile("(NXP_)?(?<prefix>[A-Z])\\s*0*(?<number>\\d+)[\\-/](?<year>\\d{2})")
+        val matcher2 = pattern2.matcher(value.trim())
+
+        return Stream.concat(matcher1.results(), matcher2.results()).map { Einsendenummer(it.group()) }.toList()
+    }
 
 }

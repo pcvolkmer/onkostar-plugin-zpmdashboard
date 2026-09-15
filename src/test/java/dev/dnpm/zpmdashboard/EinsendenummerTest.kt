@@ -48,4 +48,30 @@ class EinsendenummerTest {
         ).isFalse
     }
 
+    @Test
+    fun test2() {
+        assertThat(
+            Einsendenummer("A/20/123").partialMatches(Einsendenummer("A/2020/123"))
+        ).isTrue()
+
+        assertThat(
+            Einsendenummer("A/2026/123").partialMatches(Einsendenummer("A/2020/123"))
+        ).isFalse
+
+        assertThat(
+            Einsendenummer("A/2026/123 & A/2020/123").partialMatches(Einsendenummer("A/2020/123"))
+        ).isTrue()
+
+        assertThat(
+            Einsendenummer("A/2020/123").partialMatches(Einsendenummer("A/2020/123 & A/2020/321"))
+        ).isTrue()
+
+        assertThat(
+            Einsendenummer(null).partialMatches(Einsendenummer("A/2020/123"))
+        ).isFalse
+
+        assertThat(
+            Einsendenummer("A/2020/123").partialMatches(Einsendenummer(null))
+        ).isFalse
+    }
 }

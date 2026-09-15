@@ -120,7 +120,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, a.anmeldedatum, zpm.internextern, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
+            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, icd10_prop.description AS icd10_text, erkr.diagnosedatum, a.anmeldedatum, zpm.internextern, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
@@ -128,6 +128,11 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     LEFT JOIN dk_mtb_anmeldung a ON (a.id = e.anmeldung) 
                     LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id) 
                     LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+                    LEFT JOIN property_catalogue_version_entry icd10_prop ON (
+                        e.diagnose = icd10_prop.code 
+                        AND e.diagnose_propcat_version = icd10_prop.property_version_id
+                    )
+                    LEFT JOIN erkrankung erkr ON (ep.erkrankung_id = erkr.id)
                     WHERE p.geloescht <> 1 
                       AND patient.guid = :pat_guid 
                       AND zpmp.guid = :zpm_guid 
@@ -149,6 +154,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
                         rs.getString("icd10"),
+                        rs.getString("icd10_text"),
+                        rs.getString("diagnosedatum"),
                         patientGuid,
                         procedureGuid,
                         rs.getString("zaehlzeitpunkt"),
@@ -292,12 +299,15 @@ class ZpmDashboardService(dataSource: DataSource?) {
         dateStyle.dataFormat = createHelper.createDataFormat().getFormat("dd.MM.yyyy")
 
         val headers = listOf(
-            "PID",
+            "Nr",
+            "PatID",
+            "Datum Empfehlung",
             "ICD10",
+            "Diagnosetext",
+            "Diagnosedatum",
             "intern/extern",
             "Studie",
             "off-label",
-            "Zählzeitpunkt",
             "Consent-Datum",
             "Consentzustimmung",
             "TuDok Stand",
@@ -317,18 +327,42 @@ class ZpmDashboardService(dataSource: DataSource?) {
             .mapNotNull {
                 this.findCase(it.patientGuid, it.procedureGuid, year)
             }
-            .forEachIndexed { row, case ->
-                val row = sheet.createRow(row + 1)
+            .forEachIndexed { idx, case ->
+                val row = sheet.createRow(idx + 1)
 
-                val pidCell = row.createCell(0)
+                val nrCell = row.createCell(0)
+                nrCell.setCellValue(idx.toDouble() + 1)
+                nrCell.cellStyle = cellStyle
+
+                val pidCell = row.createCell(1)
                 pidCell.setCellValue(case.pid.orEmpty())
                 pidCell.cellStyle = cellStyle
 
-                val icd10Cell = row.createCell(1)
+                val zZeitpunktCell = row.createCell(2)
+                try {
+                    val date = LocalDate.parse(case.zaehlzeitpunkt.orEmpty())
+                    zZeitpunktCell.setCellValue(Date.valueOf(date))
+                } catch (_: Exception) { /* Do not set a value */
+                }
+                zZeitpunktCell.cellStyle = dateStyle
+
+                val icd10Cell = row.createCell(3)
                 icd10Cell.setCellValue(case.icd.orEmpty())
                 icd10Cell.cellStyle = cellStyle
 
-                val internExternColumn = row.createCell(2)
+                val dxTextCell = row.createCell(4)
+                dxTextCell.setCellValue(case.icdText.orEmpty())
+                dxTextCell.cellStyle = cellStyle
+
+                val dxDateCell = row.createCell(5)
+                try {
+                    val date = LocalDate.parse(case.diagnosisDate.orEmpty())
+                    dxDateCell.setCellValue(Date.valueOf(date))
+                } catch (_: Exception) { /* Do not set a value */
+                }
+                dxDateCell.cellStyle = dateStyle
+
+                val internExternColumn = row.createCell(6)
                 internExternColumn.setCellValue(
                     if (case.internextern == "E") {
                         "extern"
@@ -338,7 +372,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 internExternColumn.cellStyle = cellStyle
 
-                val studieColumn = row.createCell(3)
+                val studieColumn = row.createCell(7)
                 studieColumn.setCellValue(
                     if (case.studie) {
                         "Ja"
@@ -348,7 +382,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 studieColumn.cellStyle = cellStyle
 
-                val offLabelColumn = row.createCell(4)
+                val offLabelColumn = row.createCell(8)
                 offLabelColumn.setCellValue(
                     if (case.offlabel) {
                         "Ja"
@@ -358,15 +392,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 offLabelColumn.cellStyle = cellStyle
 
-                val zZeitpunktCell = row.createCell(5)
-                try {
-                    val date = LocalDate.parse(case.zaehlzeitpunkt.orEmpty())
-                    zZeitpunktCell.setCellValue(Date.valueOf(date))
-                } catch (_: Exception) { /* Do not set a value */
-                }
-                zZeitpunktCell.cellStyle = dateStyle
-
-                val consentCell = row.createCell(6)
+                val consentCell = row.createCell(9)
                 try {
                     val date = LocalDate.parse(case.consent.datum.orEmpty())
                     consentCell.setCellValue(Date.valueOf(date))
@@ -374,7 +400,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 consentCell.cellStyle = dateStyle
 
-                val consentAcceptedCell = row.createCell(7)
+                val consentAcceptedCell = row.createCell(10)
                 consentAcceptedCell.setCellValue(
                     if (case.consent.zustimmung) {
                         "Ja"
@@ -384,7 +410,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 consentAcceptedCell.cellStyle = cellStyle
 
-                val todokDateCell = row.createCell(8)
+                val todokDateCell = row.createCell(11)
                 try {
                     val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
                     todokDateCell.setCellValue(Date.valueOf(date))
@@ -392,7 +418,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 todokDateCell.cellStyle = dateStyle
 
-                val warningCell = row.createCell(9)
+                val warningCell = row.createCell(12)
                 warningCell.setCellValue(
                     if (case.warnings) {
                         "Ja"
@@ -402,7 +428,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 warningCell.cellStyle = cellStyle
 
-                val keinPF = row.createCell(10)
+                val keinPF = row.createCell(13)
                 keinPF.setCellValue(
                     if (case.warningDetails?.invalidPrimaerfall == true) {
                         "Ja"
@@ -412,7 +438,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 keinPF.cellStyle = cellStyle
 
-                val noMolGen = row.createCell(11)
+                val noMolGen = row.createCell(14)
                 noMolGen.setCellValue(
                     if (case.warningDetails?.noMolgen == true) {
                         "Ja"
@@ -422,7 +448,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 noMolGen.cellStyle = cellStyle
 
-                val noDisease = row.createCell(12)
+                val noDisease = row.createCell(15)
                 noDisease.setCellValue(
                     if (case.warningDetails?.noDisease == true) {
                         "Ja"
@@ -505,7 +531,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         }
 
         // Multiple PF in this and last year
-        return jdbcTemplate.queryForObject(sql, params, Integer::class.java) > 1
+        return jdbcTemplate.queryForObject(sql, params, Int::class.java) > 1
     }
 
     private fun hasPFWarnings(erkrankungId: Int, year: Int): Boolean {
@@ -525,7 +551,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         }
 
         // Multiple PF in this and last year
-        return jdbcTemplate.queryForList(sql, params, Integer::class.java).size > 1
+        return jdbcTemplate.queryForList(sql, params, Int::class.java).size > 1
     }
 
     data class CaseId(
@@ -538,6 +564,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
     data class Case(
         var pid: String?,
         var icd: String?,
+        var icdText: String?,
+        var diagnosisDate: String?,
         var patientGuid: String,
         var procedureGuid: String,
         var zaehlzeitpunkt: String?,
@@ -579,5 +607,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val formName: String?,
         val formDate: String?,
         val formGuid: String?
+    )
+
+    data class Diagnosis(
+        val icd10: String,
+        val name: String
     )
 }

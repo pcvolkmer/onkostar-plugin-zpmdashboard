@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.8...v0.2.9) (2026-09-15)
+
+
+### Features
+
+* partial matching Einsendenummer string ([#70](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/70)) ([43ee03b](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/43ee03b7ec9a6b8a4e946ede85db011c1f3828c8))
+
 ## [0.2.8](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.7...v0.2.8) (2026-09-12)
 
 

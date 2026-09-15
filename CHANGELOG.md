@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.10](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.9...v0.2.10) (2026-09-15)
+
+
+### Features
+
+* add additional diagnosis info to XLSX export ([#72](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/72)) ([4acc285](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/4acc2858ace84effd86408af6260879ffb67a061))
+
 ## [0.2.9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.8...v0.2.9) (2026-09-15)
 
 

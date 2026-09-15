@@ -197,7 +197,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
                 while (rs.next()) {
                     val molGen = MolGen(rs.getString("beginndatum"), rs.getBoolean("korrekt"))
-                    if (einsendenummer.matches(Einsendenummer(rs.getString("einsendenummer")))) {
+                    if (einsendenummer.partialMatches(Einsendenummer(rs.getString("einsendenummer")))) {
                         results.add(molGen)
                     }
                 }

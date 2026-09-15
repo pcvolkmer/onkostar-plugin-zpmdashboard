@@ -42,7 +42,7 @@
                     @if (data().anmeldedatum) {
                         <div>{{ data().anmeldedatum | date:'dd.MM.yyyy' }}</div>
                     } @else {
-                        <div>Nicht vorhanden</div>
+                        <div>Nicht dokumentiert</div>
                     }
 
                     @if (data().internextern === 'E') {
@@ -61,7 +61,7 @@
                         <div>Nicht zugestimmt</div>
                     }
                     @else {
-                        <div>Nicht vorhanden</div>
+                        <div>Nicht dokumentiert</div>
                     }
                 </div>
                 <div [class.success]="data().molgen.datum && data().molgen.korrekt" [class.warning]="data().molgen.datum && !data().molgen.korrekt">
@@ -73,7 +73,7 @@
                         <div>Fehlerhaft</div>
                     }
                     @else {
-                        <div>Nicht vorhanden</div>
+                        <div>Nicht dokumentiert</div>
                     }
                 </div>
                 <div [class.success]="data().empfehlungsdatum">

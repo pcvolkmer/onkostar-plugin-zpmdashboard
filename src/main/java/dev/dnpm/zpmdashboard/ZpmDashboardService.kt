@@ -120,7 +120,25 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
-            """SELECT patient.patienten_id, ep.erkrankung_id, e.diagnose AS icd10, icd10_prop.description AS icd10_text, erkr.diagnosedatum, a.anmeldedatum, zpm.internextern, e.mtbdatum, zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, zpm.zaehlzeitpunkt, zpm.offlabel, zpm.studie, e.einsendenummer, e.modellvorhaben, YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear FROM dk_mtb_empfehlung e  
+            """SELECT 
+                patient.patienten_id, 
+                ep.erkrankung_id, 
+                e.diagnose AS icd10, 
+                icd10_prop.description AS icd10_text, 
+                erkr.diagnosedatum,
+                icd10_prop2.code AS erkr_icd10,
+                icd10_prop2.description AS erkr_icd10_text, 
+                a.anmeldedatum, 
+                zpm.internextern, 
+                e.mtbdatum, 
+                zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, 
+                zpm.zaehlzeitpunkt, 
+                zpm.offlabel, 
+                zpm.studie, 
+                e.einsendenummer, 
+                e.modellvorhaben, 
+                YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear 
+                FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
                     JOIN patient ON (p.patient_id = patient.id) 
                     JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
@@ -133,6 +151,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         AND e.diagnose_propcat_version = icd10_prop.property_version_id
                     )
                     LEFT JOIN erkrankung erkr ON (ep.erkrankung_id = erkr.id)
+                    LEFT JOIN property_catalogue_version_entry icd10_prop2 ON (
+                        erkr.icd10_code = icd10_prop2.code 
+                        AND erkr.icd10_version = icd10_prop2.property_version_id
+                    )
                     WHERE p.geloescht <> 1 
                       AND patient.guid = :pat_guid 
                       AND zpmp.guid = :zpm_guid 
@@ -152,10 +174,21 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     val molgen =
                         findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer")))
 
+                    val icd10Code = if (!rs.getString("icd10").isNullOrBlank()) {
+                        rs.getString("icd10")
+                    } else {
+                        rs.getString("erkr_icd10")
+                    }
+                    val icd10Text = if (!rs.getString("icd10_text").isNullOrBlank()) {
+                        rs.getString("icd10_text")
+                    } else {
+                        rs.getString("erkr_icd10_text")
+                    }
+
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
-                        rs.getString("icd10"),
-                        rs.getString("icd10_text"),
+                        icd10Code,
+                        icd10Text,
                         rs.getString("diagnosedatum"),
                         patientGuid,
                         procedureGuid,
@@ -183,8 +216,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 null
             })
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             return null
         }
     }

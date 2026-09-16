@@ -52,6 +52,7 @@ export class CaseModel {
   public warnings: boolean;
   public warningDetails: WarningDetails;
   public aufgaben: Aufgabe[];
+  public latestFollowUp: string | null;
 
   constructor() {
     this.pid = "";
@@ -71,6 +72,7 @@ export class CaseModel {
     this.warnings = false;
     this.warningDetails = new WarningDetails();
     this.aufgaben = [];
+    this.latestFollowUp = null;
   }
 }
 

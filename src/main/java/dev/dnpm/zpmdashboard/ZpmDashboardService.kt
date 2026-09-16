@@ -137,6 +137,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 zpm.studie, 
                 e.einsendenummer, 
                 e.modellvorhaben, 
+                e.id AS empfehlungs_id,
                 YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear 
                 FROM dk_mtb_empfehlung e  
                     JOIN prozedur p ON (e.id = p.id) 
@@ -211,7 +212,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
                             null == molgen.datum,
                             !rs.getBoolean("zpm_erkrankung")
                         ),
-                        findAufgabenForPatient(patientGuid)
+                        findAufgabenForPatient(patientGuid),
+                        hasRelatedFollowUp(rs.getInt("empfehlungs_id"))
                     )
                 }
                 null
@@ -296,6 +298,28 @@ class ZpmDashboardService(dataSource: DataSource?) {
             // Nop
         }
         return emptyList()
+    }
+
+    fun hasRelatedFollowUp(empfehlungsId: Int): String? {
+        val sql =
+            """SELECT MAX(p.beginndatum) AS count FROM dk_mtb_empfehlung e
+                JOIN erkrankung_prozedur ep ON (ep.prozedur_id = e.id)
+                JOIN erkrankung_prozedur all_ep ON (all_ep.erkrankung_id = ep.erkrankung_id)
+                JOIN prozedur p ON (p.id = all_ep.prozedur_id AND p.geloescht <> 1)
+                JOIN dk_dnpm_followup fu ON (fu.id = p.id)
+                WHERE e.mtbdatum < p.beginndatum AND e.id = :empfehlungs_id""";
+
+        try {
+            val params = MapSqlParameterSource().apply {
+                addValue("empfehlungs_id", empfehlungsId)
+            }
+
+            return jdbcTemplate.queryForObject(sql, params, String::class.java)
+        } catch (_: Exception) {
+            // Nop
+        }
+
+        return null
     }
 
     fun casesXsl(year: Int): ByteArray {
@@ -614,7 +638,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
         var einschlussMvh: Boolean,
         var warnings: Boolean = false,
         var warningDetails: WarningDetails? = null,
-        val aufgaben: List<Aufgabe> = emptyList()
+        val aufgaben: List<Aufgabe> = emptyList(),
+        val latestFollowUp: String? = null
     )
 
     data class Consent(

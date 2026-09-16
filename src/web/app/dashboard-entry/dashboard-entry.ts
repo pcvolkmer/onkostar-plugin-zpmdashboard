@@ -16,6 +16,7 @@ export class DashboardEntry implements OnInit {
   @Input() patientGuid!: string;
   @Input() procedureGuid!: string;
   @Input() year!: string;
+  @Input() showFollowUp!: boolean;
 
   protected loadingError = false;
   protected showAufgaben = false;

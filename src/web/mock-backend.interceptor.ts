@@ -80,7 +80,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
                       text: "Aufgabe",
                       dueDate: "2025-01-01"
                   }
-              ] : []
+              ] : [],
+          latestFollowUp: parseInt(guid[1]) % 2 == 1 ? "2025-07-01" : null,
       };
 
       return of(new HttpResponse({

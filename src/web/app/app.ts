@@ -14,6 +14,7 @@ export class App {
   protected statistics = signal<StatisticsModel>(new StatisticsModel());
   protected cases = signal<CaseId[]>([]);
   protected year = signal<string>(new Date().getFullYear().toString());
+  protected showFollowUp = signal<boolean>(false);
 
   protected warningCount = 0;
   protected invalidPrimaerfallCount = 0;
@@ -33,6 +34,10 @@ export class App {
       if (params['year']) {
         this.year.set(params['year']);
       }
+      if (params['fu']) {
+        this.showFollowUp.set(true);
+      }
+
       this.loadData();
     });
   }

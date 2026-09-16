@@ -149,7 +149,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
             return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
                 if (rs.next()) {
-                    val molgen = findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer")))
+                    val molgen =
+                        findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer")))
 
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
@@ -189,7 +190,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
     }
 
     fun findMolGen(pid: String, einsendenummer: Einsendenummer): MolGen {
-        val sql = """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status = 0 AS korrekt FROM patient
+        val sql =
+            """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status = 0 AS korrekt FROM patient
             JOIN prozedur ON (prozedur.patient_id = patient.id)
             JOIN dk_molekulargenetik ON (dk_molekulargenetik.id = prozedur.id)
             JOIN data_form ON (data_form.id = prozedur.data_form_id)
@@ -607,10 +609,5 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val formName: String?,
         val formDate: String?,
         val formGuid: String?
-    )
-
-    data class Diagnosis(
-        val icd10: String,
-        val name: String
     )
 }

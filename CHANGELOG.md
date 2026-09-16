@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.10...v0.3.0) (2026-09-16)
+
+
+### Features
+
+* add fallback and fetch ICD10 from diagnosis ([#74](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/74)) ([8938645](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/8938645da91587370b4be958f25887d848378b00))
+* show latest follow-up ([#76](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/76)) ([34e8ae2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/34e8ae2114780174376deb08394e88eb2f63e48b))
+
+
+### Miscellaneous Chores
+
+* release 0.3.0 ([9d297f4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/9d297f483e824e2017ba82da8985ca51f12fa064))
+
 ## [0.2.10](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.9...v0.2.10) (2026-09-15)
 
 

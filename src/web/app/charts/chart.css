@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.chart {
+    @apply p-2 rounded bg-white w-full h-56 inline-block;
+}

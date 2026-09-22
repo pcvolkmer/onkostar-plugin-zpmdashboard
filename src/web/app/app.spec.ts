@@ -3,10 +3,39 @@ import {App} from './app';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {MockBackendInterceptor} from '../mock-backend.interceptor';
 import {provideRouter} from "@angular/router";
+import {provideEchartsCore} from "ngx-echarts";
 
+import * as echarts from 'echarts/core';
+
+import { PieChart } from 'echarts/charts';
+
+import {
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent
+} from 'echarts/components';
+
+import { CanvasRenderer } from 'echarts/renderers';
+
+echarts.use([
+  PieChart,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  CanvasRenderer
+]);
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
 
 describe('App', () => {
   beforeEach(async () => {
+    globalThis.ResizeObserver =
+        ResizeObserverMock as unknown as typeof ResizeObserver;
+
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
@@ -18,7 +47,8 @@ describe('App', () => {
         },
         provideRouter([
           { path: '', component: App }
-        ])
+        ]),
+        provideEchartsCore({ echarts })
       ]
     }).compileComponents();
   });

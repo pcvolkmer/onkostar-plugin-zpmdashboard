@@ -26,6 +26,10 @@
         </select>
     </h2>
     <div class="statistics">
+        <div class="charts">
+            <pie-chart [title]="'Intern/Extern'" [data]="[{name: 'intern', value: internCount}, {name: 'extern', value: externCount}]" />
+            <pie-chart [title]="'In-/Offlabel'" [data]="[{name: 'inlabel', value: statistics().primaerfaelle.length - offlabelCount}, {name: 'offlabel', value: offlabelCount}]" />
+        </div>
         <ul class="cols-4">
             <li [class.zerovalue]="statistics().anmeldungen === 0">
                 <span class="name">MTB-Anmeldungen</span>

@@ -3,10 +3,11 @@ import {ActivatedRoute, Router, RouterOutlet} from '@angular/router';
 import {OnkostarService} from './onkostar.service';
 import {CaseId, StatisticsModel} from "./model";
 import {DashboardEntry} from "./dashboard-entry/dashboard-entry";
+import {PieChartComponent} from "./charts/chart";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DashboardEntry],
+  imports: [RouterOutlet, DashboardEntry, PieChartComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

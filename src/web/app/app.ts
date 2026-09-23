@@ -24,6 +24,7 @@ export class App {
   protected offlabelCount = 0;
   protected studyCount = 0;
   protected taskCount = 0;
+  protected entitaetCounts = new Map<string, number>;
 
   protected hideNoneWarnings = false;
   protected hideNonePFWarnings = false;
@@ -113,6 +114,32 @@ export class App {
 
   protected updateTaskCount() {
     this.taskCount++;
+  }
+
+  protected updateEntitaetCounts(value: string | null) {
+    if (value == null) {
+      return;
+    }
+    let currentCount = this.entitaetCounts.get(value);
+    if (currentCount) {
+      this.entitaetCounts.set(value, ++currentCount);
+    } else {
+      this.entitaetCounts.set(value, 1);
+    }
+  }
+
+  protected entitaetenChartData(): Array<any> {
+    const sortedMap = new Map(
+        [...this.entitaetCounts.entries()].sort(([, a], [, b]) => a + b)
+    );
+    let result = []
+    let allCount = 0;
+    for (let [name, count] of sortedMap) {
+      result.push({name: name, value: count});
+      allCount += count;
+    }
+    result.push({name: 'unbekannt', value: this.statistics().primaerfaelle.length - allCount})
+    return result;
   }
 
   protected switchNonWarnings() {

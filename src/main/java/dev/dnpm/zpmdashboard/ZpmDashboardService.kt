@@ -127,7 +127,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 icd10_prop.description AS icd10_text, 
                 erkr.diagnosedatum,
                 icd10_prop2.code AS erkr_icd10,
-                icd10_prop2.description AS erkr_icd10_text, 
+                icd10_prop2.description AS erkr_icd10_text,
+                ent.bezeichnung AS entitaet,
                 a.anmeldedatum, 
                 zpm.internextern, 
                 e.mtbdatum, 
@@ -155,6 +156,9 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     LEFT JOIN property_catalogue_version_entry icd10_prop2 ON (
                         erkr.icd10_code = icd10_prop2.code 
                         AND erkr.icd10_version = icd10_prop2.property_version_id
+                    )
+                    LEFT JOIN krebsentitaet ent ON (
+                        erkr.krebsentitaet = ent.id 
                     )
                     WHERE p.geloescht <> 1 
                       AND patient.guid = :pat_guid 
@@ -190,6 +194,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("patienten_id"),
                         icd10Code,
                         icd10Text,
+                        rs.getString("entitaet"),
                         rs.getString("diagnosedatum"),
                         patientGuid,
                         procedureGuid,
@@ -623,6 +628,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         var pid: String?,
         var icd: String?,
         var icdText: String?,
+        var entitaet: String?,
         var diagnosisDate: String?,
         var patientGuid: String,
         var procedureGuid: String,

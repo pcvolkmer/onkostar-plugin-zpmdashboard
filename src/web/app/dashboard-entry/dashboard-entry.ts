@@ -28,6 +28,7 @@ export class DashboardEntry implements OnInit {
   public offlabelCountChange = output();
   public studyCountChange = output();
   public taskCountChange = output();
+  public entitaetChange = output<string | null>();
 
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
@@ -66,6 +67,7 @@ export class DashboardEntry implements OnInit {
       if (res.aufgaben.length > 0) {
         this.taskCountChange.emit();
       }
+      this.entitaetChange.emit(res.entitaet);
     });
   }
 }

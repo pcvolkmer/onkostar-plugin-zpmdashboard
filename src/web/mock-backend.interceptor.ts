@@ -55,6 +55,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
               tid: 1,
               guid: guid,
               icd: `C${guid[0]}0.${guid[7]}`,
+              entitaet: parseInt(guid[1]) % 2 == 1 ? 'A' : 'B',
               zaehlzeitpunkt:  parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[3]}-0${guid[5]}` : null,
               anmeldedatum: `2025-0${guid[1]}-0${guid[4]}`,
               internextern: parseInt(guid[1]) % 2 == 1 ? 'E' : 'I',

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.0...v0.3.1) (2026-09-23)
+
+
+### Features
+
+* add cancer entity chart ([#79](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/79)) ([73ebb9d](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/73ebb9da3326ea5ab8c9b135177dd4833d2f6d55))
+* add charts ([#77](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/77)) ([f9c5689](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/f9c5689e42af4ef837219b419902720ea79cc12e))
+
 ## [0.3.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.2.10...v0.3.0) (2026-09-16)
 
 

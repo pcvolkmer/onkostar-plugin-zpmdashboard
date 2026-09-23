@@ -62,9 +62,8 @@ export class PieChartComponent {
         },
 
         legend: {
-            orient: 'vertical',
-            left: 'left',
-            top: 'center'
+            orient: 'horizontal',
+            left: 0
         },
 
         series: [{
@@ -79,7 +78,7 @@ export class PieChartComponent {
                 show: false
             },
             radius: ['40%', '70%'],
-            center: ['60%', '50%'],
+            center: ['50%', '40%'],
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,

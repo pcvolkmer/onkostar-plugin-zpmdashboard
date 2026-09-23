@@ -24,7 +24,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
             count: 21,
         }, {
             year: 2025,
-            count: 18,
+            count: 3,
         }, {
             year: 2026,
             count: 7,
@@ -61,6 +61,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
               internextern: parseInt(guid[1]) % 2 == 1 ? 'E' : 'I',
               empfehlungsdatum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[3]}-0${guid[5]}` : null,
               latestDokuDatum: `2025-0${guid[6]}-0${guid[7]}`,
+              offlabel: parseInt(guid[1]) % 2 == 1,
+              studie: parseInt(guid[1]) % 2 == 1,
               consent: {
                   datum: parseInt(guid[1]) % 2 == 0 ? `2025-0${guid[2]}-0${guid[3]}` : null,
                   zustimmung: parseInt(guid[1]) % 2 == 0 && parseInt(guid[3]) % 2 == 0,

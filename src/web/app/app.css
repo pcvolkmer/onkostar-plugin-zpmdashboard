@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+.big-charts {
+    @apply mb-2;
+}
+
 .charts {
-    @apply grid grid-cols-3 gap-4 mb-4;
+    @apply grid grid-cols-3 gap-4 mb-2;
 }

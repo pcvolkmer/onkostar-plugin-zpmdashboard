@@ -86,6 +86,7 @@ export class App {
     this.onkostarService.getCases(this.year()).subscribe(res => {
       this.cases.set(res);
     });
+    this.entitaetCounts.clear();
   }
 
   protected updateWarningCount() {
@@ -130,16 +131,27 @@ export class App {
 
   protected entitaetenChartData(): Array<any> {
     const sortedMap = new Map(
-        [...this.entitaetCounts.entries()].sort(([, a], [, b]) => a + b)
+        [...this.entitaetCounts.entries()].sort(([, a], [, b]) => b - a)
     );
     let result = []
     let allCount = 0;
     for (let [name, count] of sortedMap) {
-      result.push({name: name, value: count});
-      allCount += count;
+      if (result.length < 5 || count > 10) {
+        result.push({name: name, value: count});
+        allCount += count;
+      }
     }
-    result.push({name: 'unbekannt', value: this.statistics().primaerfaelle.length - allCount})
+    result.push({name: 'sonstiges', value: this.selectedPFcount() - allCount})
     return result;
+  }
+
+  protected selectedPFcount(): number {
+    for (let i in this.statistics().primaerfaelle) {
+      if (`${this.statistics().primaerfaelle[i].year}` == this.year()) {
+        return this.statistics().primaerfaelle[i].count;
+      }
+    }
+    return 0;
   }
 
   protected switchNonWarnings() {

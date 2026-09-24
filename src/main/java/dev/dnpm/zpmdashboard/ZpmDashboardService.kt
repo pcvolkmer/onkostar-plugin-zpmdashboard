@@ -184,17 +184,24 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     } else {
                         rs.getString("erkr_icd10")
                     }
+
                     val icd10Text = if (!rs.getString("icd10_text").isNullOrBlank()) {
                         rs.getString("icd10_text")
                     } else {
                         rs.getString("erkr_icd10_text")
                     }
 
+                    val entitaet = if (!rs.getString("entitaet").isNullOrBlank()) {
+                        rs.getString("entitaet")
+                    } else {
+                        this.getGuessedEntity(icd10Code)
+                    }
+
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
                         icd10Code,
                         icd10Text,
-                        rs.getString("entitaet"),
+                        entitaet,
                         rs.getString("diagnosedatum"),
                         patientGuid,
                         procedureGuid,
@@ -365,6 +372,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             "Nr",
             "PatID",
             "Datum Empfehlung",
+            "Entität",
             "ICD10",
             "Diagnosetext",
             "Diagnosedatum",
@@ -409,15 +417,19 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 zZeitpunktCell.cellStyle = dateStyle
 
-                val icd10Cell = row.createCell(3)
+                val entCell = row.createCell(3)
+                entCell.setCellValue(case.entitaet.orEmpty())
+                entCell.cellStyle = cellStyle
+
+                val icd10Cell = row.createCell(4)
                 icd10Cell.setCellValue(case.icd.orEmpty())
                 icd10Cell.cellStyle = cellStyle
 
-                val dxTextCell = row.createCell(4)
+                val dxTextCell = row.createCell(5)
                 dxTextCell.setCellValue(case.icdText.orEmpty())
                 dxTextCell.cellStyle = cellStyle
 
-                val dxDateCell = row.createCell(5)
+                val dxDateCell = row.createCell(6)
                 try {
                     val date = LocalDate.parse(case.diagnosisDate.orEmpty())
                     dxDateCell.setCellValue(Date.valueOf(date))
@@ -425,7 +437,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 dxDateCell.cellStyle = dateStyle
 
-                val internExternColumn = row.createCell(6)
+                val internExternColumn = row.createCell(7)
                 internExternColumn.setCellValue(
                     if (case.internextern == "E") {
                         "extern"
@@ -435,7 +447,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 internExternColumn.cellStyle = cellStyle
 
-                val studieColumn = row.createCell(7)
+                val studieColumn = row.createCell(8)
                 studieColumn.setCellValue(
                     if (case.studie) {
                         "Ja"
@@ -445,7 +457,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 studieColumn.cellStyle = cellStyle
 
-                val offLabelColumn = row.createCell(8)
+                val offLabelColumn = row.createCell(9)
                 offLabelColumn.setCellValue(
                     if (case.offlabel) {
                         "Ja"
@@ -455,7 +467,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 offLabelColumn.cellStyle = cellStyle
 
-                val consentCell = row.createCell(9)
+                val consentCell = row.createCell(10)
                 try {
                     val date = LocalDate.parse(case.consent.datum.orEmpty())
                     consentCell.setCellValue(Date.valueOf(date))
@@ -463,7 +475,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 consentCell.cellStyle = dateStyle
 
-                val consentAcceptedCell = row.createCell(10)
+                val consentAcceptedCell = row.createCell(11)
                 consentAcceptedCell.setCellValue(
                     if (case.consent.zustimmung) {
                         "Ja"
@@ -473,7 +485,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 consentAcceptedCell.cellStyle = cellStyle
 
-                val todokDateCell = row.createCell(11)
+                val todokDateCell = row.createCell(12)
                 try {
                     val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
                     todokDateCell.setCellValue(Date.valueOf(date))
@@ -481,7 +493,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 todokDateCell.cellStyle = dateStyle
 
-                val warningCell = row.createCell(12)
+                val warningCell = row.createCell(13)
                 warningCell.setCellValue(
                     if (case.warnings) {
                         "Ja"
@@ -491,7 +503,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 warningCell.cellStyle = cellStyle
 
-                val keinPF = row.createCell(13)
+                val keinPF = row.createCell(14)
                 keinPF.setCellValue(
                     if (case.warningDetails?.invalidPrimaerfall == true) {
                         "Ja"
@@ -501,7 +513,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 keinPF.cellStyle = cellStyle
 
-                val noMolGen = row.createCell(14)
+                val noMolGen = row.createCell(15)
                 noMolGen.setCellValue(
                     if (case.warningDetails?.noMolgen == true) {
                         "Ja"
@@ -511,7 +523,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 noMolGen.cellStyle = cellStyle
 
-                val noDisease = row.createCell(15)
+                val noDisease = row.createCell(16)
                 noDisease.setCellValue(
                     if (case.warningDetails?.noDisease == true) {
                         "Ja"
@@ -615,6 +627,44 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
         // Multiple PF in this and last year
         return jdbcTemplate.queryForList(sql, params, Int::class.java).size > 1
+    }
+
+    private fun getGuessedEntity(icd10: String?): String {
+        if (icd10 == null) {
+            return ""
+        }
+
+        val mapping = mapOf(
+            "Lungenkarzinom" to listOf("C33", "C34"),
+            "Darm" to listOf("C18", "C19", "C20", "C21"),
+            "Mamma" to listOf("C50"),
+            "Gynäkologische Tumoren" to listOf("C51", "C52", "C53", "C54", "C55", "C56", "C57", "C58"),
+            "Haut" to listOf("C43", "C44"),
+            "Prostata" to listOf("C61"),
+            "Pankreas" to listOf("C25"),
+            "Kopf-Hals-Tumoren" to listOf("C00", "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14", "C30", "C31", "C32"),
+            "Neuroonkologische Tumoren" to listOf("C70", "C71", "C72"),
+            "Magen" to listOf("C16"),
+            "Speiseröhre" to listOf("C15"),
+            "Sonstige Gastrointestinale Tumoren" to listOf("C17", "C23", "C24", "C26"),
+            "Endokrine Malignome" to listOf(), // Sonstiges ...
+            "Lymphom" to listOf(), // Sonstiges
+            "Leukämie" to listOf("C91", "C92", "C93", "C94", "C95"),
+            "Hämatologische Systemerkrankungen" to listOf(), // Sonstiges
+            "Hoden, Penis" to listOf(), // Sonstiges
+            "Niere" to listOf("C64", "C65"),
+            "Harnblase" to listOf("C67"),
+            "Muskuloskelettale Tumoren" to listOf("C40", "C41", "C49"),
+        )
+
+        mapping.entries.forEach { entry ->
+            entry.value.forEach {
+                if (icd10.startsWith(it)) {
+                    return entry.key
+                }
+            }
+        }
+        return ""
     }
 
     data class CaseId(

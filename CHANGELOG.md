@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.2...v0.3.3) (2026-09-25)
+
+
+### Features
+
+* add birthdate to xlsx export ([#85](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/85)) ([f8a8384](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/f8a8384980d4ef0d7f55e82f4a723813bbe296e9))
+* guess entity by ICD10 code and export it ([#82](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/82)) ([9f2594c](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/9f2594cd25dce0ebe01130e0b283b883d1f37695))
+* ignore unknown icd10-entity mapping ([#86](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/86)) ([9836e8c](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/9836e8cd65eb79f1292df882cd5a2c5201cb3100))
+* show possible duplicates ([#84](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/84)) ([d1be941](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d1be9412ba075edbaf7506feebed087b7525b934))
+
 ## [0.3.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.1...v0.3.2) (2026-09-23)
 
 

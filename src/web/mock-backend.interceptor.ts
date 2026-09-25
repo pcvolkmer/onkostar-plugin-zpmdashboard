@@ -85,7 +85,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
                       dueDate: "2025-01-01"
                   }
               ] : [],
-          latestFollowUp: parseInt(guid[1]) % 2 == 1 ? "2025-07-01" : null,
+              latestFollowUp: parseInt(guid[1]) % 2 == 1 ? "2025-07-01" : null,
       };
 
       return of(new HttpResponse({
@@ -110,6 +110,13 @@ export class MockBackendInterceptor implements HttpInterceptor {
               pid: "34567890",
               patientGuid: "34567890-1234-1234-1234-123456789012",
               procedureGuid: "34567890-2234-1234-1234-123456789012",
+              duplicate: true,
+          },
+          {
+              pid: "34567890",
+              patientGuid: "34567890-1234-1234-1234-123456789012",
+              procedureGuid: "34567890-2234-1234-1234-123456789012",
+              duplicate: true,
           },
       ];
 

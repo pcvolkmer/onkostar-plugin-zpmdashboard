@@ -22,6 +22,11 @@
                 💥 <b>Doku überprüfen!</b>
             </div>
             }
+            @if (duplicate) {
+            <div class="check-required">
+                💥 <b>Duplikat?</b>
+            </div>
+            }
             <div class="patient-link">
                 <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten in Onkostar</a>
             </div>

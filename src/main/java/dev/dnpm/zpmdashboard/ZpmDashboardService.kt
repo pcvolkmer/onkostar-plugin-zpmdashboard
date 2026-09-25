@@ -655,9 +655,9 @@ class ZpmDashboardService(dataSource: DataSource?) {
         return jdbcTemplate.queryForList(sql, params, Int::class.java).size > 1
     }
 
-    private fun getGuessedEntity(icd10: String?): String {
+    private fun getGuessedEntity(icd10: String?): String? {
         if (icd10 == null) {
-            return ""
+            return null
         }
 
         val mapping = mapOf(
@@ -690,7 +690,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
             }
         }
-        return ""
+        return null
     }
 
     data class CaseId(

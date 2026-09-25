@@ -89,7 +89,13 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     fun findPrimaerfaelleCaseId(year: Int): List<CaseId> {
         val sql =
-            """SELECT DISTINCT pat.patienten_id, pat.guid AS pat_guid, p.guid AS proc_guid, e.guid AS e_guid FROM dk_zpm_auswertungen zpm
+            """SELECT DISTINCT 
+                pat.patienten_id, 
+                pat.guid AS pat_guid, 
+                p.guid AS proc_guid, 
+                e.guid AS e_guid,
+                zpm.zaehlzeitpunkt 
+            FROM dk_zpm_auswertungen zpm
             JOIN prozedur p ON (zpm.id = p.id)
             LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
             LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
@@ -102,7 +108,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             addValue("year", year)
         }
 
-        return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
+        val result = jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
             val caseIds = mutableListOf<CaseId>()
             while (rs!!.next()) {
                 caseIds.add(
@@ -110,12 +116,21 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("patienten_id"),
                         rs.getString("pat_guid"),
                         rs.getString("proc_guid"),
-                        rs.getString("e_guid").orEmpty()
+                        rs.getString("e_guid").orEmpty(),
+                        rs.getString("zaehlzeitpunkt")
                     )
                 )
             }
             return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
-        })
+        });
+
+        return result.mapIndexed { index, resultItem ->
+            resultItem.copy(
+                duplicate = result
+                    .filterIndexed { i, _ -> i != index }
+                    .map { "${it.pid}-${it.zaehlzeitpunkt}" }.contains("${resultItem.pid}-${resultItem.zaehlzeitpunkt}")
+            )
+        }
     }
 
     fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
@@ -671,7 +686,9 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val pid: String,
         val patientGuid: String,
         val procedureGuid: String,
-        val erkrankungGuid: String
+        val erkrankungGuid: String,
+        val zaehlzeitpunkt: String,
+        val duplicate: Boolean = false
     )
 
     data class Case(

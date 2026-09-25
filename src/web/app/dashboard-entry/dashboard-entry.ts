@@ -17,6 +17,7 @@ export class DashboardEntry implements OnInit {
   @Input() procedureGuid!: string;
   @Input() year!: string;
   @Input() showFollowUp!: boolean;
+  @Input() duplicate!: boolean;
 
   protected loadingError = false;
   protected showAufgaben = false;

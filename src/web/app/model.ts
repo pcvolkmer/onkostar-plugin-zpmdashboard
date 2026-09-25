@@ -26,11 +26,13 @@ export class CaseId {
   public pid: string;
   public patientGuid: string;
   public procedureGuid: string;
+  public duplicate: boolean;
 
   constructor() {
     this.pid = "0";
     this.patientGuid = "00000000-0000-0000-0000-000000000000";
     this.procedureGuid = "00000000-0000-0000-0000-000000000000";
+    this.duplicate = false;
   }
 }
 

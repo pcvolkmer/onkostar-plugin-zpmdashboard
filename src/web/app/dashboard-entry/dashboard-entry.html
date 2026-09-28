@@ -1,39 +1,60 @@
 <div class="dashboard-entry">
     @if (data().pid.length > 0) {
         <div class="header">
-            <div>PID: <b>{{ data().pid }}</b></div>
+            <div class="item">
+                <label>
+                    Export
+                    <input class="export-selection" type="checkbox" title="Export" (click)="onExportMarkChanged($event)" />
+                </label>
+            </div>
+            <div class="item">
+                <span class="name">PID</span>
+                <span class="value">{{ data().pid }}</span>
+            </div>
             @if (data().icd) {
-                <div>ICD-10: <b>{{ data().icd }}</b></div>
+                <div class="item">
+                    <span class="name">ICD-10</span>
+                    <span class="value">{{ data().icd }}</span>
+                </div>
             } @else {
-                <div>ICD-10: <b>???.?</b></div>
+                <div class="item">
+                    <span class="name">ICD-10</span>
+                    <span class="value">???.?</span>
+                </div>
             }
             @if (data().zaehlzeitpunkt) {
-                <div>Zählzeitpunkt: <b>{{ data().zaehlzeitpunkt | date:'dd.MM.yyyy' }}</b></div>
+                <div class="item">
+                    <span class="name">Zählzeitpunkt</span>
+                    <span class="value">{{ data().zaehlzeitpunkt | date:'dd.MM.yyyy' }}</span>
+                </div>
             } @else {
-                <div>Zählzeitpunkt: <b>?</b></div>
+                <div class="item">
+                    <span class="name">Zählzeitpunkt</span>
+                    <span class="value">?</span>
+                </div>
+            }
+            <div class="item patient-link">
+                <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten</a>
+            </div>
+            @if (data().aufgaben.length > 0) {
+                <div class="item check-tasks">
+                    <a class="button aufgabe-button" (click)="showAufgaben = !showAufgaben">🧪 {{ data().aufgaben.length }} Aufgabe(n)</a>
+                </div>
             }
             @if (data().warningDetails.invalidPrimaerfall) {
-                <div class="check-nopf">
-                    💥 <b>Kein Primärfall?</b>
+                <div class="item check-nopf">
+                    <span>💥 <b>Kein Primärfall?</b></span>
                 </div>
             }
             @if (data().warnings || loadingError) {
-            <div class="check-required">
-                💥 <b>Doku überprüfen!</b>
-            </div>
+                <div class="item check-required">
+                    <span>💥 <b>Doku prüfen!</b></span>
+                </div>
             }
             @if (duplicate) {
-            <div class="check-required">
-                💥 <b>Duplikat?</b>
-            </div>
-            }
-            <div class="patient-link">
-                <a class="button" href="/onkostar/index.html?patientId={{data().patientGuid}}&procedureId={{ data().procedureGuid }}" target="_blank">Zum Patienten in Onkostar</a>
-            </div>
-            @if (data().aufgaben.length > 0) {
-            <div class="check-tasks">
-                <a class="button aufgabe-button" (click)="showAufgaben = !showAufgaben">🧪 {{ data().aufgaben.length }} Aufgabe(n)</a>
-            </div>
+                <div class="item check-required">
+                    <span>💥 <b>Duplikat?</b></span>
+                </div>
             }
         </div>
         @if (loadingError) {

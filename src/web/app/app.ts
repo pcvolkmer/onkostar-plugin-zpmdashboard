@@ -29,6 +29,8 @@ export class App {
   protected hideNonePFWarnings = false;
   protected hideNoneTasks = false;
 
+  protected exportMarkedCases = new Array<string>();
+
   constructor(readonly onkostarService: OnkostarService, readonly route: ActivatedRoute, readonly router: Router) {
     this.onkostarService = onkostarService;
     this.route.queryParams.subscribe((params) => {
@@ -73,6 +75,8 @@ export class App {
     this.offlabelCount = 0;
     this.studyCount = 0;
     this.taskCount = 0;
+
+    this.exportMarkedCases = [];
 
     this.statistics.set(new StatisticsModel());
     this.onkostarService.getStatistics(this.year()).subscribe(res => {
@@ -202,5 +206,15 @@ export class App {
     document.querySelectorAll('.dashboard-entry').forEach(elem => {
       (elem as HTMLElement).style.display = '';
     });
+  }
+
+  protected onExportMarkChanged($event: {pid: string, checked: boolean}) {
+    if ($event.checked) {
+      if (!this.exportMarkedCases.includes($event.pid)) {
+        this.exportMarkedCases.push($event.pid);
+      }
+    } else {
+      this.exportMarkedCases = this.exportMarkedCases.filter(pid => pid !== $event.pid);
+    }
   }
 }

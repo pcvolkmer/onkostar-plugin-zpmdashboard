@@ -351,7 +351,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         return null
     }
 
-    fun casesXsl(year: Int): ByteArray {
+    fun casesXsl(year: Int, pid: List<String>): ByteArray {
         val workbook: Workbook = XSSFWorkbook()
         val sheet = workbook.createSheet(
             "Primärfälle - Stand %s".format(
@@ -412,7 +412,13 @@ class ZpmDashboardService(dataSource: DataSource?) {
             cell.cellStyle = headerStyle
         }
 
-        this.findPrimaerfaelleCaseId(year)
+        val primaerfaelle = if (pid.isEmpty()) {
+            this.findPrimaerfaelleCaseId(year)
+        } else {
+            this.findPrimaerfaelleCaseId(year).filter { it.pid in pid }
+        }
+
+        primaerfaelle
             .mapNotNull {
                 this.findCase(it.patientGuid, it.procedureGuid, year)
             }

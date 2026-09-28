@@ -32,6 +32,7 @@ describe('DashboardEntry', () => {
 
   it('should render title', async () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled?.textContent).toContain('PID: 12345678');
+    expect(compiled?.textContent).toContain('PID')
+    expect(compiled?.textContent).toContain('12345678');
   });
 });

@@ -140,10 +140,12 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 patient.geburtsdatum, 
                 ep.erkrankung_id, 
                 e.diagnose AS icd10, 
-                icd10_prop.description AS icd10_text, 
+                icd10_prop.shortdesc AS icd10_text, 
                 erkr.diagnosedatum,
                 icd10_prop2.code AS erkr_icd10,
-                icd10_prop2.description AS erkr_icd10_text,
+                icd10_prop2.shortdesc AS erkr_icd10_text,
+                icdo3t_prop.code AS icdo3t,
+                icdo3t_prop.shortdesc AS icdo3t_text,
                 ent.bezeichnung AS entitaet,
                 a.anmeldedatum, 
                 zpm.internextern, 
@@ -172,6 +174,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
                     LEFT JOIN property_catalogue_version_entry icd10_prop2 ON (
                         erkr.icd10_code = icd10_prop2.code 
                         AND erkr.icd10_version = icd10_prop2.property_version_id
+                    )
+                    LEFT JOIN property_catalogue_version_entry icdo3t_prop ON (
+                        erkr.lokalisation = icdo3t_prop.code 
+                        AND erkr.lokalisation_version = icdo3t_prop.property_version_id
                     )
                     LEFT JOIN krebsentitaet ent ON (
                         erkr.krebsentitaet = ent.id 
@@ -218,6 +224,8 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("geburtsdatum"),
                         icd10Code,
                         icd10Text,
+                        rs.getString("icdo3t"),
+                        rs.getString("icdo3t_text"),
                         entitaet,
                         rs.getString("diagnosedatum"),
                         patientGuid,
@@ -391,8 +399,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
             "Geburtsdatum",
             "Datum Empfehlung",
             "Entität",
-            "ICD10",
+            "ICD-10",
             "Diagnosetext",
+            "ICD-O-3 T",
+            "Lokalisation",
             "Diagnosedatum",
             "intern/extern",
             "Studie",
@@ -454,14 +464,22 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 entCell.cellStyle = cellStyle
 
                 val icd10Cell = row.createCell(5)
-                icd10Cell.setCellValue(case.icd.orEmpty())
+                icd10Cell.setCellValue(case.icd10.orEmpty())
                 icd10Cell.cellStyle = cellStyle
 
                 val dxTextCell = row.createCell(6)
-                dxTextCell.setCellValue(case.icdText.orEmpty())
+                dxTextCell.setCellValue(case.icd10Text.orEmpty())
                 dxTextCell.cellStyle = cellStyle
 
-                val dxDateCell = row.createCell(7)
+                val icdO3TCell = row.createCell(7)
+                icdO3TCell.setCellValue(case.icdO3T.orEmpty())
+                icdO3TCell.cellStyle = cellStyle
+
+                val icdO3TTextCell = row.createCell(8)
+                icdO3TTextCell.setCellValue(case.icdO3TText.orEmpty())
+                icdO3TTextCell.cellStyle = cellStyle
+
+                val dxDateCell = row.createCell(9)
                 try {
                     val date = LocalDate.parse(case.diagnosisDate.orEmpty())
                     dxDateCell.setCellValue(Date.valueOf(date))
@@ -469,7 +487,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 dxDateCell.cellStyle = dateStyle
 
-                val internExternColumn = row.createCell(8)
+                val internExternColumn = row.createCell(10)
                 internExternColumn.setCellValue(
                     if (case.internextern == "E") {
                         "extern"
@@ -479,7 +497,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 internExternColumn.cellStyle = cellStyle
 
-                val studieColumn = row.createCell(9)
+                val studieColumn = row.createCell(11)
                 studieColumn.setCellValue(
                     if (case.studie) {
                         "Ja"
@@ -489,7 +507,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 studieColumn.cellStyle = cellStyle
 
-                val offLabelColumn = row.createCell(10)
+                val offLabelColumn = row.createCell(12)
                 offLabelColumn.setCellValue(
                     if (case.offlabel) {
                         "Ja"
@@ -499,7 +517,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 offLabelColumn.cellStyle = cellStyle
 
-                val consentCell = row.createCell(11)
+                val consentCell = row.createCell(13)
                 try {
                     val date = LocalDate.parse(case.consent.datum.orEmpty())
                     consentCell.setCellValue(Date.valueOf(date))
@@ -507,7 +525,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 consentCell.cellStyle = dateStyle
 
-                val consentAcceptedCell = row.createCell(12)
+                val consentAcceptedCell = row.createCell(14)
                 consentAcceptedCell.setCellValue(
                     if (case.consent.zustimmung) {
                         "Ja"
@@ -517,7 +535,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 consentAcceptedCell.cellStyle = cellStyle
 
-                val todokDateCell = row.createCell(13)
+                val todokDateCell = row.createCell(15)
                 try {
                     val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
                     todokDateCell.setCellValue(Date.valueOf(date))
@@ -525,7 +543,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 todokDateCell.cellStyle = dateStyle
 
-                val warningCell = row.createCell(14)
+                val warningCell = row.createCell(16)
                 warningCell.setCellValue(
                     if (case.warnings) {
                         "Ja"
@@ -535,7 +553,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 warningCell.cellStyle = cellStyle
 
-                val keinPF = row.createCell(15)
+                val keinPF = row.createCell(17)
                 keinPF.setCellValue(
                     if (case.warningDetails?.invalidPrimaerfall == true) {
                         "Ja"
@@ -545,7 +563,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 keinPF.cellStyle = cellStyle
 
-                val noMolGen = row.createCell(16)
+                val noMolGen = row.createCell(18)
                 noMolGen.setCellValue(
                     if (case.warningDetails?.noMolgen == true) {
                         "Ja"
@@ -555,7 +573,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 noMolGen.cellStyle = cellStyle
 
-                val noDisease = row.createCell(17)
+                val noDisease = row.createCell(19)
                 noDisease.setCellValue(
                     if (case.warningDetails?.noDisease == true) {
                         "Ja"
@@ -711,8 +729,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
     data class Case(
         var pid: String?,
         var geburtsdatum: String?,
-        var icd: String?,
-        var icdText: String?,
+        var icd10: String?,
+        var icd10Text: String?,
+        var icdO3T: String?,
+        var icdO3TText: String?,
         var entitaet: String?,
         var diagnosisDate: String?,
         var patientGuid: String,

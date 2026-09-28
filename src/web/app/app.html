@@ -65,9 +65,7 @@
                 <span class="value">{{offlabelCount}}</span>
             </li>
         </ul>
-        <div>
-            <a class="xls button" href="./cases.xlsx?year={{year()}}">📊 Auswertung als Excel-Datei herunterladen</a>
-        </div>
+        <br/>
         <ul class="cols-4">
             <li class="warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
                 <span class="name">Kein Primärfall?
@@ -113,6 +111,10 @@
                 <option value="{{y}}" [selected]="y == year()">{{y}}</option>
             }
         </select>
+        <a class="xls button" href="./cases.xlsx?year={{year()}}">📊 Alles als Excel-Datei herunterladen</a>
+        @if (exportMarkedCases.length > 0) {
+            <a class="xls selected button" href="./cases.xlsx?year={{year()}}&pid={{ exportMarkedCases.join(',') }}">📊 Auswahl als Excel-Datei herunterladen</a>
+        }
     </h2>
     <div>
         @if (cases().length === 0) {
@@ -129,6 +131,7 @@
                                 (studyCountChange)="updateStudyCount()"
                                 (taskCountChange)="updateTaskCount()"
                                 (entitaetChange)="updateEntitaetCounts($event)"
+                                (exportMarkChanged)="onExportMarkChanged($event)"
                                 [pid]="caseId.pid"
                                 [patientGuid]="caseId.patientGuid"
                                 [procedureGuid]="caseId.procedureGuid"

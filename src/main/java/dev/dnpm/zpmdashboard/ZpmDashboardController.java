@@ -88,8 +88,8 @@ public class ZpmDashboardController {
     }
 
     @GetMapping(value = "/zpm-dashboard/cases.xlsx")
-    public ResponseEntity<byte[]> getCasesXls(@RequestParam int year) {
-        final var cases = this.zpmDashboardService.casesXsl(year);
+    public ResponseEntity<byte[]> getCasesXls(@RequestParam int year, @RequestParam(required = false, defaultValue = "") List<String> pid) {
+        final var cases = this.zpmDashboardService.casesXsl(year, pid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=Primaerfaelle_%d.xlsx", year))

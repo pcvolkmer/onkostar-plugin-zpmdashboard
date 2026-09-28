@@ -29,6 +29,9 @@ export class DashboardEntry implements OnInit {
   public studyCountChange = output();
   public taskCountChange = output();
   public entitaetChange = output<string | null>();
+  public exportMarkChanged = output<{pid: string, checked: boolean}>();
+
+  protected readonly FollowUpState = FollowUpState;
 
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
@@ -74,18 +77,19 @@ export class DashboardEntry implements OnInit {
   get followUpState(): FollowUpState {
     let latestFollowUp = this.data().latestFollowUp;
     if (latestFollowUp == null) {
-      console.log("No follow-up date");
       return FollowUpState.NO_FOLLOW_UP;
     }
     const dueDate = new Date();
     dueDate.setMonth(dueDate.getMonth() -3);
     const followUpDate = new Date(latestFollowUp);
-    console.log(dueDate, followUpDate);
     if (followUpDate < dueDate) {
       return FollowUpState.FOLLOW_UP_PENDING;
     }
     return FollowUpState.FOLLOW_UP_OK;
   }
 
-  protected readonly FollowUpState = FollowUpState;
+  protected onExportMarkChanged(e: Event) {
+    const checked = (e.target as HTMLInputElement).checked;
+    this.exportMarkChanged.emit({pid: this.pid, checked});
+  }
 }

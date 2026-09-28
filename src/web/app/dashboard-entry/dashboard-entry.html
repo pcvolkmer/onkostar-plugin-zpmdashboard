@@ -11,14 +11,25 @@
                 <span class="name">PID</span>
                 <span class="value">{{ data().pid }}</span>
             </div>
-            @if (data().icd) {
+            @if (data().icd10) {
                 <div class="item">
                     <span class="name">ICD-10</span>
-                    <span class="value">{{ data().icd }}</span>
+                    <span class="value">{{ data().icd10 }}</span>
                 </div>
             } @else {
                 <div class="item">
                     <span class="name">ICD-10</span>
+                    <span class="value">???.?</span>
+                </div>
+            }
+            @if (data().icdO3T) {
+                <div class="item">
+                    <span class="name">ICD-O-3 T</span>
+                    <span class="value">{{ data().icdO3T }}</span>
+                </div>
+            } @else {
+                <div class="item">
+                    <span class="name">ICD-O-3 T</span>
                     <span class="value">???.?</span>
                 </div>
             }

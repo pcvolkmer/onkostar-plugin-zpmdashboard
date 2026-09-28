@@ -80,6 +80,12 @@ export class CaseModel {
   }
 }
 
+export enum FollowUpState {
+    NO_FOLLOW_UP,
+    FOLLOW_UP_PENDING,
+    FOLLOW_UP_OK,
+}
+
 export class Consent {
     public datum: string | null;
     public zustimmung: boolean;

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, output, signal} from '@angular/core';
-import {CaseModel} from "../model";
+import {CaseModel, FollowUpState} from "../model";
 import {OnkostarService} from "../onkostar.service";
 import {DatePipe} from "@angular/common";
 
@@ -16,7 +16,6 @@ export class DashboardEntry implements OnInit {
   @Input() patientGuid!: string;
   @Input() procedureGuid!: string;
   @Input() year!: string;
-  @Input() showFollowUp!: boolean;
   @Input() duplicate!: boolean;
 
   protected loadingError = false;
@@ -52,7 +51,7 @@ export class DashboardEntry implements OnInit {
       res.procedureGuid = btoa(res.procedureGuid);
       this.data.set(res);
 
-      if (res.warnings) {
+      if (res.warnings || this.duplicate) {
         this.warningsChange.emit();
       }
       if (res.warningDetails.invalidPrimaerfall) {
@@ -71,4 +70,22 @@ export class DashboardEntry implements OnInit {
       this.entitaetChange.emit(res.entitaet);
     });
   }
+
+  get followUpState(): FollowUpState {
+    let latestFollowUp = this.data().latestFollowUp;
+    if (latestFollowUp == null) {
+      console.log("No follow-up date");
+      return FollowUpState.NO_FOLLOW_UP;
+    }
+    const dueDate = new Date();
+    dueDate.setMonth(dueDate.getMonth() -3);
+    const followUpDate = new Date(latestFollowUp);
+    console.log(dueDate, followUpDate);
+    if (followUpDate < dueDate) {
+      return FollowUpState.FOLLOW_UP_PENDING;
+    }
+    return FollowUpState.FOLLOW_UP_OK;
+  }
+
+  protected readonly FollowUpState = FollowUpState;
 }

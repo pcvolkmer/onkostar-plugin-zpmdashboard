@@ -6,10 +6,6 @@
 }
 
 .dashboard-entry .details {
-    @apply grid grid-cols-6 gap-1;
-}
-
-.dashboard-entry .details.withFollowUp {
     @apply grid grid-cols-7 gap-1;
 }
 
@@ -55,9 +51,12 @@
     background-color: var(--color-primary);
 }
 
-.dashboard-entry .details > .mvh-case,
-.dashboard-entry .details > .follow-up {
+.dashboard-entry .details > .mvh-case {
     @apply bg-gray-600;
+}
+
+.dashboard-entry .details > .follow-up {
+    @apply bg-red-600;
 }
 
 .dashboard-entry .details > .success {
@@ -74,7 +73,7 @@
 
 .dashboard-entry .check-nopf,
 .dashboard-entry .check-required {
-    @apply text-red-800 uppercase;
+    @apply text-red-600 uppercase;
 }
 
 .dashboard-entry .aufgaben {

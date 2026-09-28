@@ -41,7 +41,7 @@
                 <div><b>Fehler</b><div>bei der Auswertung der Daten!</div></div>
             </div>
         } @else {
-            <div [class.withFollowUp]="showFollowUp" class="details">
+            <div class="details">
                 <div [class.success]="data().anmeldedatum">
                     <div class="name">Anmeldedatum MTB</div>
                     @if (data().anmeldedatum) {
@@ -112,14 +112,17 @@
                         <div>Kein Einschluss MV §64e</div>
                     }
                 </div>
-                @if (showFollowUp) {
-                <div [class.success]="data().latestFollowUp" class="follow-up">
+                <div
+                        [class.success]="followUpState === FollowUpState.FOLLOW_UP_OK"
+                        [class.warning]="followUpState === FollowUpState.FOLLOW_UP_PENDING"
+                        class="follow-up">
                     <div class="name">Follow-Ups</div>
                     @if (data().latestFollowUp) {
                         <div>Zuletzt: {{ data().latestFollowUp | date: 'dd.MM.yyyy'}}</div>
+                    } @else {
+                        <div>Nicht dokumentiert</div>
                     }
                 </div>
-                }
             </div>
             @if (showAufgaben) {
             <div class="aufgaben">

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.2...v0.4.0) (2026-09-28)
+
+
+### Features
+
+* add birthdate to xlsx export ([#85](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/85)) ([f8a8384](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/f8a8384980d4ef0d7f55e82f4a723813bbe296e9))
+* always show available latest follow-up ([#87](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/87)) ([3e319da](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/3e319dae7df8e1112316e6ab92e59bd9a32316b2))
+* export checked cases ([#88](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/88)) ([d15b2ed](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d15b2ed164d0f5b469bffcdd214b426b9982121b))
+* export ICD-O-3 T and localization text ([#89](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/89)) ([16a40dd](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/16a40dd1e261b882a21652f6644687ad3e3d5a07))
+* guess entity by ICD10 code and export it ([#82](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/82)) ([9f2594c](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/9f2594cd25dce0ebe01130e0b283b883d1f37695))
+* ignore unknown icd10-entity mapping ([#86](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/86)) ([9836e8c](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/9836e8cd65eb79f1292df882cd5a2c5201cb3100))
+* show possible duplicates ([#84](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/84)) ([d1be941](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d1be9412ba075edbaf7506feebed087b7525b934))
+
+
+### Miscellaneous Chores
+
+* release 0.4.0 ([fdc3af1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/fdc3af18d6dc935b1d8a71602862e42616d272a1))
+
 ## [0.3.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.1...v0.3.2) (2026-09-23)
 
 

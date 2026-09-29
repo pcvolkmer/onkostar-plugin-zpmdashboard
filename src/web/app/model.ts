@@ -2,17 +2,17 @@ export class StatisticsModel {
   public anmeldungen: number;
   public empfehlungen: number;
   public consents: number;
-  public primaerfaelle: PrimaerfaelleModel[];
+  public cases: CasesModel[];
 
   constructor() {
     this.anmeldungen = 0;
     this.empfehlungen = 0;
     this.consents = 0;
-    this.primaerfaelle = [];
+    this.cases = [];
   }
 }
 
-export class PrimaerfaelleModel {
+export class CasesModel {
   public year: number;
   public count: number;
 
@@ -144,3 +144,9 @@ export class Aufgabe {
   }
 }
 
+export enum Context {
+  None,
+  Primaerfaelle,
+  AlleFaelle,
+  Modellvorhaben
+}

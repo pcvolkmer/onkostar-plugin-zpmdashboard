@@ -19,7 +19,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
         anmeldungen: 42,
         empfehlungen: 39,
         consents: 41,
-        primaerfaelle: [{
+        cases: [{
             year: 2024,
             count: 21,
         }, {
@@ -28,13 +28,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
         }, {
             year: 2026,
             count: 7,
-        }],
-        cases: [
-          {
-            pid: "12345678",
-            guid: "12345678-1234-1234-1234-123456789012",
-          }
-        ]
+        }]
       };
 
       return of(new HttpResponse({

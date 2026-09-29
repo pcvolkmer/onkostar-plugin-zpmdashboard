@@ -1,15 +1,28 @@
+<div class="context-selection">
+    <ul>
+        <li [class.selected]="context() === Context.Primaerfaelle" (click)="onContextChange('pf')">
+            ZPM-Primärfälle
+        </li>
+        <li [class.selected]="context() === Context.AlleFaelle" (click)="onContextChange('all')">
+            Alle MTB-Fälle (Anmeldung)
+        </li>
+        <li [class.selected]="context() === Context.Modellvorhaben" (click)="onContextChange('mv')">
+            Modellvorhaben
+        </li>
+    </ul>
+</div>
 <main class="main-content">
-    <h2>Primärfälle der letzten drei Jahre</h2>
+    <h2>{{ casesName }} der letzten drei Jahre</h2>
     <div class="statistics">
         <ul class="cols-3 pf">
-            @for (primaerfall of statistics().primaerfaelle; track primaerfall) {
-                <li (click)="onYearChange(primaerfall.year.toString())" [class.currentyear]="primaerfall.year.toString() == year()">
-                    <span class="name">Primärfälle <b>{{primaerfall.year}}</b></span>
-                    <span class="value">{{primaerfall.count}}</span>
+            @for (cases of statistics().cases; track cases) {
+                <li (click)="onYearChange(cases.year.toString())" [class.currentyear]="cases.year.toString() == year()">
+                    <span class="name">{{ casesName }} <b>{{cases.year}}</b></span>
+                    <span class="value">{{cases.count}}</span>
                 </li>
             }
         </ul>
-        @if (statistics().primaerfaelle.length == 0) {
+        @if (statistics().cases.length == 0) {
             <div class="loading">
                 <div class="spinner"></div>
                 <div>Lade Daten ...</div>
@@ -44,38 +57,49 @@
                 <span class="value">{{statistics().empfehlungen}}</span>
             </li>
             <li [class.zerovalue]="statistics().consents === 0">
-                <span class="name">Consents</span>
+                <span class="name">MolPath-Consents</span>
                 <span class="value">{{statistics().consents}}</span>
             </li>
             <li class="empty"></li>
-            <li [class.zerovalue]="internCount === 0">
-                <span class="name">Primärfälle (intern)</span>
-                <span class="value">{{internCount}}</span>
-            </li>
-            <li [class.zerovalue]="externCount === 0">
-                <span class="name">Primärfälle (extern)</span>
-                <span class="value">{{externCount}}</span>
-            </li>
-            <li [class.zerovalue]="studyCount === 0">
-                <span class="name">Primärfälle (Studie)</span>
-                <span class="value">{{studyCount}}</span>
-            </li>
-            <li [class.zerovalue]="offlabelCount === 0">
-                <span class="name">Primärfälle (off-label)</span>
-                <span class="value">{{offlabelCount}}</span>
-            </li>
+            @if (context() == Context.Primaerfaelle) {
+                <li [class.zerovalue]="internCount === 0">
+                    <span class="name">Primärfälle (intern)</span>
+                    <span class="value">{{internCount}}</span>
+                </li>
+                <li [class.zerovalue]="externCount === 0">
+                    <span class="name">Primärfälle (extern)</span>
+                    <span class="value">{{externCount}}</span>
+                </li>
+                <li [class.zerovalue]="studyCount === 0">
+                    <span class="name">Primärfälle (Studie)</span>
+                    <span class="value">{{studyCount}}</span>
+                </li>
+                <li [class.zerovalue]="offlabelCount === 0">
+                    <span class="name">Primärfälle (off-label)</span>
+                    <span class="value">{{offlabelCount}}</span>
+                </li>
+            } @else {
+                <li class="empty"></li>
+                <li class="empty"></li>
+                <li class="empty"></li>
+                <li class="empty"></li>
+            }
         </ul>
         <br/>
         <ul class="cols-4">
-            <li class="warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
-                <span class="name">Kein Primärfall?
-                    @if (invalidPrimaerfallCount > 0) {
-                        &nbsp;-&nbsp;
-                        <label class="filter" title="Danach filtern"><input (change)="switchNonPFWarnings()" class="filter" type="checkbox" [checked]="hideNonePFWarnings" />&nbsp;Danach filtern</label>
-                    }
-                </span>
-                <span class="value">{{invalidPrimaerfallCount}}</span>
-            </li>
+            @if (context() == Context.Primaerfaelle) {
+                <li class="warnings" [class.zerovalue]="invalidPrimaerfallCount === 0">
+                    <span class="name">Kein Primärfall?
+                        @if (invalidPrimaerfallCount > 0) {
+                            &nbsp;-&nbsp;
+                            <label class="filter" title="Danach filtern"><input (change)="switchNonPFWarnings()" class="filter" type="checkbox" [checked]="hideNonePFWarnings" />&nbsp;Danach filtern</label>
+                        }
+                    </span>
+                    <span class="value">{{invalidPrimaerfallCount}}</span>
+                </li>
+            } @else {
+                <li class="empty"></li>
+            }
             <li class="warnings" [class.zerovalue]="warningCount === 0">
                 <span class="name">Doku prüfen!
                     @if (warningCount > 0) {
@@ -99,11 +123,11 @@
     </div>
     <h2>
         @if (hideNoneWarnings) {
-            Primärfälle mit zu prüfender Dokumentation
+            {{ casesName }} mit zu prüfender Dokumentation
         } @else if (hideNonePFWarnings) {
             Mögliche nicht zählbare Primärfälle
         } @else {
-            Primärfälle
+            {{ casesName }}
         }
         &nbsp;
         <select (change)="onYearChangeEvent($event)">
@@ -113,12 +137,12 @@
         </select>
         <a class="xls button" href="./cases.xlsx?year={{year()}}">📊 Alles als Excel-Datei herunterladen</a>
         @if (exportMarkedCases.length > 0) {
-            <a class="xls selected button" href="./cases.xlsx?year={{year()}}&pid={{ exportMarkedCases.join(',') }}">📊 Auswahl als Excel-Datei herunterladen</a>
+            <a class="xls selected button" href="./cases.xlsx?year={{year()}}&context={{context()}}&pid={{ exportMarkedCases.join(',') }}">📊 Auswahl als Excel-Datei herunterladen</a>
         }
     </h2>
     <div>
         @if (cases().length === 0) {
-            <p>Keine Primärfälle gefunden.</p>
+            <p>Keine {{ casesName }} gefunden.</p>
         } @else {
             <ul>
                 @for (caseId of cases(); track caseId) {
@@ -136,6 +160,7 @@
                                 [patientGuid]="caseId.patientGuid"
                                 [procedureGuid]="caseId.procedureGuid"
                                 [year]="year()"
+                                [context]="context()"
                                 [duplicate]="caseId.duplicate">
                             <div class="dashboard-entry">Lade Daten ...</div>
                         </app-dashboard-entry>

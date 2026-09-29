@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -122,7 +123,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
             }
             return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
-        });
+        })
 
         return result.mapIndexed { index, resultItem ->
             resultItem.copy(
@@ -133,7 +134,101 @@ class ZpmDashboardService(dataSource: DataSource?) {
         }
     }
 
-    fun findCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
+    fun findAllCaseId(year: Int): List<CaseId> {
+        val sql =
+            """SELECT DISTINCT 
+                pat.patienten_id, 
+                pat.guid AS pat_guid, 
+                p.guid AS proc_guid, 
+                e.guid AS e_guid,
+                p.beginndatum 
+            FROM dk_mtb_anmeldung anm
+            JOIN prozedur p ON (anm.id = p.id)
+            LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+            LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
+            JOIN patient pat ON (p.patient_id = pat.id)
+            WHERE YEAR(beginndatum) = :year AND p.geloescht <> 1 AND pat.nachname <> 'Momentum'
+            ORDER BY beginndatum, pat.patienten_id;
+        """.trimIndent()
+
+        val params = MapSqlParameterSource().apply {
+            addValue("year", year)
+        }
+
+        val result = jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
+            val caseIds = mutableListOf<CaseId>()
+            while (rs!!.next()) {
+                caseIds.add(
+                    CaseId(
+                        rs.getString("patienten_id"),
+                        rs.getString("pat_guid"),
+                        rs.getString("proc_guid"),
+                        rs.getString("e_guid").orEmpty(),
+                        rs.getString("beginndatum")
+                    )
+                )
+            }
+            return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
+        })
+
+        return result.mapIndexed { index, resultItem ->
+            resultItem.copy(
+                duplicate = result
+                    .filterIndexed { i, _ -> i != index }
+                    .map { "${it.pid}-${it.zaehlzeitpunkt}" }.contains("${resultItem.pid}-${resultItem.zaehlzeitpunkt}")
+            )
+        }
+    }
+
+    fun findModellvorhabenCaseId(year: Int): List<CaseId> {
+        val sql =
+            """SELECT DISTINCT 
+                pat.patienten_id, 
+                pat.guid AS pat_guid, 
+                p.guid AS proc_guid, 
+                e.guid AS e_guid,
+                empf.mtbdatum 
+            FROM dk_mtb_anmeldung a
+            JOIN prozedur p ON (a.id = p.id)
+            JOIN dk_mtb_empfehlung empf ON (empf.anmeldung = a.id)
+            JOIN prozedur empfp ON (empfp.id = empf.id)
+            LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+            LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
+            JOIN patient pat ON (p.patient_id = pat.id)
+            WHERE YEAR(empf.mtbdatum) = :year AND p.geloescht <> 1 AND empf.modellvorhaben = 1 AND empfp.patient_id = p.patient_id AND pat.nachname <> 'Momentum'
+            ORDER BY mtbdatum, pat.patienten_id;
+        """.trimIndent()
+
+        val params = MapSqlParameterSource().apply {
+            addValue("year", year)
+        }
+
+        val result = jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet? ->
+            val caseIds = mutableListOf<CaseId>()
+            while (rs!!.next()) {
+                caseIds.add(
+                    CaseId(
+                        rs.getString("patienten_id"),
+                        rs.getString("pat_guid"),
+                        rs.getString("proc_guid"),
+                        rs.getString("e_guid").orEmpty(),
+                        rs.getString("mtbdatum")
+                    )
+                )
+            }
+            return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
+        })
+
+        return result.mapIndexed { index, resultItem ->
+            resultItem.copy(
+                duplicate = result
+                    .filterIndexed { i, _ -> i != index }
+                    .map { "${it.pid}-${it.zaehlzeitpunkt}" }.contains("${resultItem.pid}-${resultItem.zaehlzeitpunkt}")
+            )
+        }
+    }
+
+    fun findZpmCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
         val sql =
             """SELECT 
                 patient.patienten_id,
@@ -264,6 +359,151 @@ class ZpmDashboardService(dataSource: DataSource?) {
         }
     }
 
+    fun findAnmeldungCase(patientGuid: String, procedureGuid: String, year: Int): Case? {
+        val sql =
+            """SELECT 
+                patient.patienten_id,
+                patient.geburtsdatum, 
+                ep.erkrankung_id, 
+                e.diagnose AS icd10, 
+                icd10_prop.shortdesc AS icd10_text, 
+                erkr.diagnosedatum,
+                icd10_prop2.code AS erkr_icd10,
+                icd10_prop2.shortdesc AS erkr_icd10_text,
+                icdo3t_prop.code AS icdo3t,
+                icdo3t_prop.shortdesc AS icdo3t_text,
+                ent.bezeichnung AS entitaet,
+                a.anmeldedatum, 
+                zpm.internextern, 
+                e.mtbdatum, 
+                zpmep.erkrankung_id IS NOT NULL AS zpm_erkrankung, 
+                zpm.zaehlzeitpunkt, 
+                zpm.offlabel, 
+                zpm.studie, 
+                e.einsendenummer, 
+                e.modellvorhaben, 
+                e.id AS empfehlungs_id, 
+                empfp.geloescht AS empf_geloescht,
+                zpmp.geloescht AS zpm_geloescht,
+                YEAR(p.beginndatum) = YEAR(zpm.zaehlzeitpunkt) AS sameyear 
+                FROM dk_mtb_anmeldung a  
+                    JOIN prozedur p ON (a.id = p.id) 
+                    JOIN patient ON (p.patient_id = patient.id) 
+                    LEFT JOIN dk_zpm_auswertungen zpm ON (zpm.zaehlzeitpunkt = p.beginndatum) 
+                    LEFT JOIN prozedur zpmp ON (zpmp.id = zpm.id) 
+                    LEFT JOIN dk_mtb_empfehlung e ON (a.id = e.anmeldung) 
+                    LEFT JOIN prozedur empfp ON (empfp.id = e.id) 
+                    LEFT JOIN erkrankung_prozedur zpmep ON (zpmep.prozedur_id = zpm.id) 
+                    LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+                    LEFT JOIN property_catalogue_version_entry icd10_prop ON (
+                        e.diagnose = icd10_prop.code 
+                        AND e.diagnose_propcat_version = icd10_prop.property_version_id
+                    )
+                    LEFT JOIN erkrankung erkr ON (ep.erkrankung_id = erkr.id)
+                    LEFT JOIN property_catalogue_version_entry icd10_prop2 ON (
+                        erkr.icd10_code = icd10_prop2.code 
+                        AND erkr.icd10_version = icd10_prop2.property_version_id
+                    )
+                    LEFT JOIN property_catalogue_version_entry icdo3t_prop ON (
+                        erkr.lokalisation = icdo3t_prop.code 
+                        AND erkr.lokalisation_version = icdo3t_prop.property_version_id
+                    )
+                    LEFT JOIN krebsentitaet ent ON (
+                        erkr.krebsentitaet = ent.id 
+                    )
+                    WHERE p.geloescht <> 1 
+                      AND patient.guid = :pat_guid 
+                      AND p.guid = :a_guid 
+                      AND YEAR(p.beginndatum) = :year  
+                      ORDER BY p.beginndatum  
+                      LIMIT 1;""".trimIndent()
+
+        try {
+            val params = MapSqlParameterSource().apply {
+                addValue("pat_guid", patientGuid)
+                addValue("a_guid", procedureGuid)
+                addValue("year", year)
+            }
+
+            return jdbcTemplate.query(sql, params, ResultSetExtractor { rs: ResultSet ->
+                if (rs.next()) {
+                    val molgen = if (rs.getBoolean("empf_geloescht")) {
+                        MolGen(null, false)
+                    } else {
+                        findMolGen(rs.getString("patienten_id"), Einsendenummer(rs.getString("einsendenummer")))
+                    }
+
+                    val icd10Code = if (!rs.getString("icd10").isNullOrBlank()) {
+                        rs.getString("icd10")
+                    } else {
+                        rs.getString("erkr_icd10")
+                    }
+
+                    val icd10Text = if (!rs.getString("icd10_text").isNullOrBlank()) {
+                        rs.getString("icd10_text")
+                    } else {
+                        rs.getString("erkr_icd10_text")
+                    }
+
+                    val entitaet = if (!rs.getString("entitaet").isNullOrBlank()) {
+                        rs.getString("entitaet")
+                    } else {
+                        this.getGuessedEntity(icd10Code)
+                    }
+
+                    return@ResultSetExtractor Case(
+                        rs.getString("patienten_id"),
+                        Einsendenummer(rs.getString("einsendenummer"))
+                            .splitContained()
+                            .mapNotNull { it.normalized(Format.Patho) }
+                            .distinct(),
+                        rs.getString("geburtsdatum"),
+                        icd10Code,
+                        icd10Text,
+                        rs.getString("icdo3t"),
+                        rs.getString("icdo3t_text"),
+                        entitaet,
+                        rs.getString("diagnosedatum"),
+                        patientGuid,
+                        procedureGuid,
+                        rs.getString("zaehlzeitpunkt"),
+                        rs.getString("anmeldedatum"),
+                        rs.getString("internextern"),
+                        findMolPathConsent(patientGuid),
+                        molgen,
+                        if (rs.getBoolean("empf_geloescht")) {
+                            null
+                        } else {
+                            rs.getString("mtbdatum")
+                        },
+                        findLatestDokuDatum(rs.getInt("erkrankung_id")),
+                        rs.getBoolean("offlabel"),
+                        rs.getBoolean("studie"),
+                        if (rs.getBoolean("zpm_geloescht")) {
+                            false
+                        } else {
+                            rs.getBoolean("modellvorhaben")
+                        },
+                        hasWarnings(rs.getInt("erkrankung_id"), year)
+                                || !rs.getBoolean("sameyear")
+                                || !rs.getBoolean("zpm_erkrankung")
+                                || null == molgen.datum,
+                        WarningDetails(
+                            hasPFWarnings(rs.getInt("erkrankung_id"), year),
+                            null == molgen.datum,
+                            !rs.getBoolean("zpm_erkrankung")
+                        ),
+                        findAufgabenForPatient(patientGuid),
+                        hasRelatedFollowUp(rs.getInt("empfehlungs_id"))
+                    )
+                }
+                null
+            })
+        } catch (_: Exception) {
+            return null
+        }
+    }
+
     fun findMolGen(pid: String, einsendenummer: Einsendenummer): MolGen {
         val sql =
             """SELECT prozedur.beginndatum, dk_molekulargenetik.einsendenummer, prozedur.status = 0 AS korrekt FROM patient
@@ -348,7 +588,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 JOIN erkrankung_prozedur all_ep ON (all_ep.erkrankung_id = ep.erkrankung_id)
                 JOIN prozedur p ON (p.id = all_ep.prozedur_id AND p.geloescht <> 1)
                 JOIN dk_dnpm_followup fu ON (fu.id = p.id)
-                WHERE e.mtbdatum < p.beginndatum AND e.id = :empfehlungs_id""";
+                WHERE e.mtbdatum < p.beginndatum AND e.id = :empfehlungs_id"""
 
         try {
             val params = MapSqlParameterSource().apply {
@@ -363,7 +603,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         return null
     }
 
-    fun casesXsl(year: Int, pid: List<String>): ByteArray {
+    fun casesXsl(year: Int, context: String, pid: List<String>): ByteArray {
         val workbook: Workbook = XSSFWorkbook()
         val sheet = workbook.createSheet(
             "Primärfälle - Stand %s".format(
@@ -426,15 +666,25 @@ class ZpmDashboardService(dataSource: DataSource?) {
             cell.cellStyle = headerStyle
         }
 
-        val primaerfaelle = if (pid.isEmpty()) {
-            this.findPrimaerfaelleCaseId(year)
-        } else {
-            this.findPrimaerfaelleCaseId(year).filter { it.pid in pid }
+        val allCases = when (context) {
+            "all" -> this.findAllCaseId(year)
+            "mv" -> this.findModellvorhabenCaseId(year)
+            else -> this.findPrimaerfaelleCaseId(year)
         }
 
-        primaerfaelle
+        val cases = if (pid.isEmpty()) {
+            allCases
+        } else {
+            allCases.filter { it.pid in pid }
+        }
+
+        cases
             .mapNotNull {
-                this.findCase(it.patientGuid, it.procedureGuid, year)
+                if (context == "pf") {
+                    this.findZpmCase(it.patientGuid, it.procedureGuid, year)
+                } else {
+                    this.findAnmeldungCase(it.patientGuid, it.procedureGuid, year)
+                }
             }
             .forEachIndexed { idx, case ->
                 val row = sheet.createRow(idx + 1)

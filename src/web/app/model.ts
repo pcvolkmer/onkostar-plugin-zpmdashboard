@@ -38,6 +38,7 @@ export class CaseId {
 
 export class CaseModel {
   public pid: string;
+  public einsendenummern: string[];
   public icd10: string;
   public icdO3T: string;
   public entitaet: string | null;
@@ -60,6 +61,7 @@ export class CaseModel {
 
   constructor() {
     this.pid = "";
+    this.einsendenummern = [];
     this.icd10 = "";
     this.icdO3T = "";
     this.entitaet = null;

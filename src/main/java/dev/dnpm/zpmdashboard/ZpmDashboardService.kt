@@ -221,6 +221,10 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
                     return@ResultSetExtractor Case(
                         rs.getString("patienten_id"),
+                        Einsendenummer(rs.getString("einsendenummer"))
+                            .splitContained()
+                            .mapNotNull { it.normalized(Format.Patho) }
+                            .distinct(),
                         rs.getString("geburtsdatum"),
                         icd10Code,
                         icd10Text,
@@ -728,6 +732,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
     data class Case(
         var pid: String?,
+        var einsendenummern: List<String>,
         var geburtsdatum: String?,
         var icd10: String?,
         var icd10Text: String?,

@@ -22,14 +22,10 @@ class Einsendenummer(private val value: String?) {
     }
 
     fun normalized(): String? {
-        fun keyFromMatcher(matcher: Matcher): String {
-            val prefix = matcher.group("prefix")
-            val year = matcher.group("year")
-            val number = matcher.group("number")
+        return normalized(Format.CCC)
+    }
 
-            return String.format("%s/20%s/%s", prefix, year, number)
-        }
-
+    fun normalized(f: (Matcher) -> String): String? {
         if (value.isNullOrBlank()) {
             return null
         }
@@ -41,9 +37,9 @@ class Einsendenummer(private val value: String?) {
         val matcher2 = pattern2.matcher(value.trim())
 
         if (matcher1.find()) {
-            return keyFromMatcher(matcher1)
+            return f(matcher1)
         } else if (matcher2.find()) {
-            return keyFromMatcher(matcher2)
+            return f(matcher2)
         } else {
             return null
         }
@@ -63,4 +59,21 @@ class Einsendenummer(private val value: String?) {
         return Stream.concat(matcher1.results(), matcher2.results()).map { Einsendenummer(it.group()) }.toList()
     }
 
+}
+
+object Format {
+    val CCC = { matcher: Matcher ->
+        val prefix = matcher.group("prefix")
+        val year = matcher.group("year")
+        val number = matcher.group("number")
+
+        String.format("%s/20%s/%s", prefix, year, number)
+    }
+    val Patho = { matcher: Matcher ->
+        val prefix = matcher.group("prefix")
+        val year = matcher.group("year")
+        val number = matcher.group("number")
+
+        String.format("%s%s-%s", prefix, number, year)
+    }
 }

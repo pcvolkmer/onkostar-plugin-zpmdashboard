@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.0...v0.4.1) (2026-09-29)
+
+
+### Features
+
+* add dashboard for MV and all cases ([#92](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/92)) ([d7406f0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d7406f01cf1361904ddcb4a38deb0b511f05389f))
+* show einsendenummer ([#90](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/90)) ([60efbc7](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/60efbc775255acf850bb768cc4576ff71294d10a))
+
 ## [0.4.0](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.3.2...v0.4.0) (2026-09-28)
 
 

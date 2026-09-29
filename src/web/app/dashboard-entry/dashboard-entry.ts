@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, output, signal} from '@angular/core';
-import {CaseModel, FollowUpState} from "../model";
+import {CaseModel, Context, FollowUpState} from "../model";
 import {OnkostarService} from "../onkostar.service";
 import {DatePipe} from "@angular/common";
 
@@ -16,6 +16,7 @@ export class DashboardEntry implements OnInit {
   @Input() patientGuid!: string;
   @Input() procedureGuid!: string;
   @Input() year!: string;
+  @Input() context!: Context | null;
   @Input() duplicate!: boolean;
 
   protected loadingError = false;
@@ -38,7 +39,7 @@ export class DashboardEntry implements OnInit {
   }
 
   ngOnInit() {
-    this.onkostarService.getCase(this.patientGuid, this.procedureGuid, this.year).subscribe(res => {
+    this.onkostarService.getCase(this.patientGuid, this.procedureGuid, this.year, this.context).subscribe(res => {
       if (null === res) {
         this.warningsChange.emit();
         let res = new CaseModel();

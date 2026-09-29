@@ -37,7 +37,6 @@ import java.util.TimeZone;
 
 @RestController
 public class ZpmDashboardController {
-
     private final ZpmDashboardService zpmDashboardService;
     private final ResourceLoader resourceLoader;
 
@@ -52,7 +51,8 @@ public class ZpmDashboardController {
 
     @GetMapping("/zpm-dashboard")
     public ResponseEntity<byte[]> getIndexPage(
-            @RequestParam(required = false, defaultValue = "") String year
+            @RequestParam(required = false, defaultValue = "") String year,
+            @RequestParam(required = false, defaultValue = "pf") String context
     ) {
         try {
             final var indexPage = resourceLoader.getResource("classpath:static/index.html").getInputStream().readAllBytes();
@@ -65,13 +65,32 @@ public class ZpmDashboardController {
     }
 
     @GetMapping("/zpm-dashboard/statistics")
-    public ResponseEntity<Statistics> getStatistics(@RequestParam int year) {
+    public ResponseEntity<Statistics> getStatistics(
+            @RequestParam int year,
+            @RequestParam(required = false, defaultValue = "pf") String context
+    ) {
         final var currentYear = LocalDate.now(TimeZone.getDefault().toZoneId()).getYear();
-        final var pf = List.of(
-                new Primaerfaelle(currentYear - 2, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 2).size()),
-                new Primaerfaelle(currentYear - 1, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 1).size()),
-                new Primaerfaelle(currentYear, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear).size())
-        );
+
+        List<StatisticCases> pf;
+        if (context.equals("all")) {
+            pf = List.of(
+                    new StatisticCases(currentYear - 2, this.zpmDashboardService.findAllCaseId(currentYear - 2).size()),
+                    new StatisticCases(currentYear - 1, this.zpmDashboardService.findAllCaseId(currentYear - 1).size()),
+                    new StatisticCases(currentYear, this.zpmDashboardService.findAllCaseId(currentYear).size())
+            );
+        } else if (context.equals("mv")) {
+            pf = List.of(
+                    new StatisticCases(currentYear - 2, this.zpmDashboardService.findModellvorhabenCaseId(currentYear - 2).size()),
+                    new StatisticCases(currentYear - 1, this.zpmDashboardService.findModellvorhabenCaseId(currentYear - 1).size()),
+                    new StatisticCases(currentYear, this.zpmDashboardService.findModellvorhabenCaseId(currentYear).size())
+            );
+        } else {
+            pf = List.of(
+                    new StatisticCases(currentYear - 2, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 2).size()),
+                    new StatisticCases(currentYear - 1, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear - 1).size()),
+                    new StatisticCases(currentYear, this.zpmDashboardService.findPrimaerfaelleCaseId(currentYear).size())
+            );
+        }
 
         final var statistics = new Statistics(
                 this.zpmDashboardService.countMtbAnmeldungInYear(year),
@@ -82,14 +101,28 @@ public class ZpmDashboardController {
     }
 
     @GetMapping("/zpm-dashboard/cases")
-    public ResponseEntity<List<ZpmDashboardService.CaseId>> getCases(@RequestParam int year) {
+    public ResponseEntity<List<ZpmDashboardService.CaseId>> getCases(
+            @RequestParam int year,
+            @RequestParam(required = false, defaultValue = "pf") String context
+    ) {
+        if (context.equals("all")) {
+            final var cases = this.zpmDashboardService.findAllCaseId(year);
+            return ResponseEntity.ok(cases);
+        } else if (context.equals("mv")) {
+            final var cases = this.zpmDashboardService.findModellvorhabenCaseId(year);
+            return ResponseEntity.ok(cases);
+        }
         final var cases = this.zpmDashboardService.findPrimaerfaelleCaseId(year);
         return ResponseEntity.ok(cases);
     }
 
     @GetMapping(value = "/zpm-dashboard/cases.xlsx")
-    public ResponseEntity<byte[]> getCasesXls(@RequestParam int year, @RequestParam(required = false, defaultValue = "") List<String> pid) {
-        final var cases = this.zpmDashboardService.casesXsl(year, pid);
+    public ResponseEntity<byte[]> getCasesXls(
+            @RequestParam int year,
+            @RequestParam(required = false, defaultValue = "pf") String context,
+            @RequestParam(required = false, defaultValue = "") List<String> pid
+    ) {
+        final var cases = this.zpmDashboardService.casesXsl(year, context, pid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=Primaerfaelle_%d.xlsx", year))
@@ -101,14 +134,20 @@ public class ZpmDashboardController {
     public ResponseEntity<?> getCase(
             @PathVariable String patientGuid,
             @PathVariable String procedureGuid,
-            @RequestParam(required = false) Integer year
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false, defaultValue = "pf") String context
     ) {
         if (null == year) {
             year = LocalDate.now(ZoneId.systemDefault()).getYear();
         }
 
         try {
-            final var theCase = this.zpmDashboardService.findCase(patientGuid, procedureGuid, year);
+            ZpmDashboardService.Case theCase;
+            if ("mv".equals(context) || "all".equals(context)) {
+                theCase = this.zpmDashboardService.findAnmeldungCase(patientGuid, procedureGuid, year);
+            } else {
+                theCase = this.zpmDashboardService.findZpmCase(patientGuid, procedureGuid, year);
+            }
             if (theCase == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -122,21 +161,21 @@ public class ZpmDashboardController {
         public Integer anmeldungen;
         public Integer empfehlungen;
         public Integer consents;
-        public List<Primaerfaelle> primaerfaelle;
+        public List<StatisticCases> cases;
 
-        public Statistics(int anmeldungen, int empfehlungen, int consents, List<Primaerfaelle> primaerfaelle) {
+        public Statistics(int anmeldungen, int empfehlungen, int consents, List<StatisticCases> cases) {
             this.anmeldungen = anmeldungen;
             this.empfehlungen = empfehlungen;
             this.consents = consents;
-            this.primaerfaelle = primaerfaelle;
+            this.cases = cases;
         }
     }
 
-    public static class Primaerfaelle {
+    public static class StatisticCases {
         public Integer year;
         public Integer count;
 
-        public Primaerfaelle(int year, int count) {
+        public StatisticCases(int year, int count) {
             this.year = year;
             this.count = count;
         }

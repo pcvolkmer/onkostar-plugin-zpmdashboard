@@ -1,7 +1,7 @@
-import {Component, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterOutlet} from '@angular/router';
 import {OnkostarService} from './onkostar.service';
-import {CaseId, StatisticsModel} from "./model";
+import {CaseId, Context, StatisticsModel} from "./model";
 import {DashboardEntry} from "./dashboard-entry/dashboard-entry";
 import {PieChartComponent} from "./charts/chart";
 
@@ -11,10 +11,11 @@ import {PieChartComponent} from "./charts/chart";
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
   protected statistics = signal<StatisticsModel>(new StatisticsModel());
   protected cases = signal<CaseId[]>([]);
   protected year = signal<string>(new Date().getFullYear().toString());
+  protected context = signal<Context>(Context.Primaerfaelle);
 
   protected warningCount = 0;
   protected invalidPrimaerfallCount = 0;
@@ -33,9 +34,20 @@ export class App {
 
   constructor(readonly onkostarService: OnkostarService, readonly route: ActivatedRoute, readonly router: Router) {
     this.onkostarService = onkostarService;
+  }
+
+  ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       if (params['year']) {
         this.year.set(params['year']);
+      }
+
+      if (params['context'] === 'pf') {
+        this.context.set(Context.Primaerfaelle);
+      } else if (params['context'] === 'all') {
+        this.context.set(Context.AlleFaelle);
+      } else if (params['context'] === 'mv') {
+        this.context.set(Context.Modellvorhaben);
       }
 
       this.loadData();
@@ -64,6 +76,15 @@ export class App {
     });
   }
 
+  protected onContextChange(context: string) {
+    this.router.navigate([], {
+      queryParams: {
+        context: context
+      },
+      queryParamsHandling: 'merge', // Preserve other query parameters
+    });
+  }
+
   protected loadData() {
     this.hideNoneWarnings = false;
     this.hideNonePFWarnings = false;
@@ -79,11 +100,11 @@ export class App {
     this.exportMarkedCases = [];
 
     this.statistics.set(new StatisticsModel());
-    this.onkostarService.getStatistics(this.year()).subscribe(res => {
+    this.onkostarService.getStatistics(this.year(), this.context()).subscribe(res => {
       this.statistics.set(res);
     });
     this.cases.set([]);
-    this.onkostarService.getCases(this.year()).subscribe(res => {
+    this.onkostarService.getCases(this.year(), this.context()).subscribe(res => {
       this.cases.set(res);
     });
     this.entitaetCounts.clear();
@@ -146,9 +167,9 @@ export class App {
   }
 
   protected selectedPFcount(): number {
-    for (let i in this.statistics().primaerfaelle) {
-      if (`${this.statistics().primaerfaelle[i].year}` == this.year()) {
-        return this.statistics().primaerfaelle[i].count;
+    for (let i in this.statistics().cases) {
+      if (`${this.statistics().cases[i].year}` == this.year()) {
+        return this.statistics().cases[i].count;
       }
     }
     return 0;
@@ -217,4 +238,16 @@ export class App {
       this.exportMarkedCases = this.exportMarkedCases.filter(pid => pid !== $event.pid);
     }
   }
+
+  protected get casesName(): string {
+    if (this.context() == Context.AlleFaelle) {
+      return 'Fälle';
+    } else if (this.context() == Context.Modellvorhaben) {
+      return 'MV-Fälle';
+    } else {
+      return 'Primärfälle';
+    }
+  }
+
+  protected readonly Context = Context;
 }

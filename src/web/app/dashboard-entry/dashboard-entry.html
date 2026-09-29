@@ -11,6 +11,17 @@
                 <span class="name">PID</span>
                 <span class="value">{{ data().pid }}</span>
             </div>
+            @if (data().einsendenummern && data().einsendenummern.length > 0) {
+                <div class="item">
+                    <span class="name">Einsendenummer</span>
+                    <span class="value">{{ data().einsendenummern.join(', ') }}</span>
+                </div>
+            } @else {
+                <div class="item">
+                    <span class="name">Einsendenummer</span>
+                    <span class="value">?</span>
+                </div>
+            }
             @if (data().icd10) {
                 <div class="item">
                     <span class="name">ICD-10</span>
@@ -102,7 +113,7 @@
                     }
                 </div>
                 <div [class.success]="data().molgen.datum && data().molgen.korrekt" [class.warning]="data().molgen.datum && !data().molgen.korrekt">
-                    <div class="name">Molgen Untersuchung</div>
+                    <div class="name">MolPath Untersuchung</div>
                     @if (data().molgen.datum && data().molgen.korrekt) {
                         <div>{{ data().molgen.datum | date:'dd.MM.yyyy' }}</div>
                     } @else if (data().molgen.datum && !data().molgen.korrekt) {

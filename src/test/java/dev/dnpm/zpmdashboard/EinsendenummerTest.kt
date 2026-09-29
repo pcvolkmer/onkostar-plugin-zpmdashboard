@@ -74,4 +74,34 @@ class EinsendenummerTest {
             Einsendenummer("A/2020/123").partialMatches(Einsendenummer(null))
         ).isFalse
     }
+
+    @Test
+    fun testShouldNormalizeToCCC() {
+        assertThat(
+            Einsendenummer("A/20/123").normalized(Format.CCC)).isEqualTo("A/2020/123")
+
+        assertThat(
+            Einsendenummer("A/2020/123").normalized(Format.CCC)).isEqualTo("A/2020/123")
+
+        assertThat(
+            Einsendenummer("A123-20").normalized(Format.CCC)).isEqualTo("A/2020/123")
+
+        assertThat(
+            Einsendenummer("A123-2020").normalized(Format.CCC)).isEqualTo("A/2020/123")
+    }
+
+    @Test
+    fun testShouldNormalizeToPatho() {
+        assertThat(
+            Einsendenummer("A/20/123").normalized(Format.Patho)).isEqualTo("A123-20")
+
+        assertThat(
+            Einsendenummer("A/2020/123").normalized(Format.Patho)).isEqualTo("A123-20")
+
+        assertThat(
+            Einsendenummer("A123-20").normalized(Format.Patho)).isEqualTo("A123-20")
+
+        assertThat(
+            Einsendenummer("A123-2020").normalized(Format.Patho)).isEqualTo("A123-20")
+    }
 }

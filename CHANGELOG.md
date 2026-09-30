@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.1...v0.4.2) (2026-09-30)
+
+
+### Features
+
+* split components by use case ([#93](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/93)) ([761d662](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/761d66262fa049555ee86ee939def71baa1697b6))
+
 ## [0.4.1](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.0...v0.4.1) (2026-09-29)
 
 

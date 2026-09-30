@@ -171,13 +171,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             return@ResultSetExtractor caseIds.distinctBy { it.patientGuid + it.erkrankungGuid }
         })
 
-        return result.mapIndexed { index, resultItem ->
-            resultItem.copy(
-                duplicate = result
-                    .filterIndexed { i, _ -> i != index }
-                    .map { "${it.pid}-${it.zaehlzeitpunkt}" }.contains("${resultItem.pid}-${resultItem.zaehlzeitpunkt}")
-            )
-        }
+        return result
     }
 
     fun findModellvorhabenCaseId(year: Int): List<CaseId> {
@@ -466,7 +460,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("diagnosedatum"),
                         patientGuid,
                         procedureGuid,
-                        rs.getString("zaehlzeitpunkt"),
+                        rs.getString("anmeldedatum"),
                         rs.getString("anmeldedatum"),
                         rs.getString("internextern"),
                         findMolPathConsent(patientGuid),

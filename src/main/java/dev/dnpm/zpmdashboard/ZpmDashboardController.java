@@ -49,10 +49,14 @@ public class ZpmDashboardController {
         this.resourceLoader = resourceLoader;
     }
 
-    @GetMapping("/zpm-dashboard")
+    @GetMapping(path = {
+            "/zpm-dashboard",
+            "/zpm-dashboard/prime",
+            "/zpm-dashboard/all",
+            "/zpm-dashboard/mv"
+    }, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<byte[]> getIndexPage(
-            @RequestParam(required = false, defaultValue = "") String year,
-            @RequestParam(required = false, defaultValue = "pf") String context
+            @RequestParam(required = false, defaultValue = "") String year
     ) {
         try {
             final var indexPage = resourceLoader.getResource("classpath:static/index.html").getInputStream().readAllBytes();

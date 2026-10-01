@@ -4,7 +4,7 @@
         <ul class="cols-3 pf">
             @for (cases of statistics().cases; track cases) {
                 <li (click)="onYearChange(cases.year.toString())" [class.currentyear]="cases.year.toString() == year()">
-                    <span class="name">MV-Fälle <b>{{cases.year}}</b></span>
+                    <span class="name">MV-Patienten <b>{{cases.year}}</b></span>
                     <span class="value">{{cases.count}}</span>
                 </li>
             }

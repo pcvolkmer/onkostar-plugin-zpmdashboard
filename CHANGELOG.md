@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.3...v0.4.4) (2026-10-01)
+
+
+### Bug Fixes
+
+* table column name ([#98](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/98)) ([12f2ab9](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/12f2ab9797925b5c77f320a34403a96f3141971a))
+
 ## [0.4.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.2...v0.4.3) (2026-10-01)
 
 

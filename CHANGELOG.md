@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.3](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.2...v0.4.3) (2026-10-01)
+
+
+### Features
+
+* count all procedures, not distinct by patient ([#97](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/97)) ([c1d3183](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/c1d3183d8d09000b7fc71493d7e0427eebfdd8ba))
+* load zpm case for mv ([#95](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/95)) ([507b10a](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/507b10a5d963b1d6d9554785c9550a689d397f0c))
+
 ## [0.4.2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.1...v0.4.2) (2026-09-30)
 
 

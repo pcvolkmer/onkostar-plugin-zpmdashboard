@@ -147,7 +147,7 @@ public class ZpmDashboardController {
 
         try {
             ZpmDashboardService.Case theCase;
-            if ("mv".equals(context) || "all".equals(context)) {
+            if ("all".equals(context)) {
                 theCase = this.zpmDashboardService.findAnmeldungCase(patientGuid, procedureGuid, year);
             } else {
                 theCase = this.zpmDashboardService.findZpmCase(patientGuid, procedureGuid, year);

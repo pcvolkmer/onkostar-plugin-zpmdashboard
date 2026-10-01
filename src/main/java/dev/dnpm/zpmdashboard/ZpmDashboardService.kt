@@ -44,7 +44,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
     private val jdbcTemplate: NamedParameterJdbcTemplate = NamedParameterJdbcTemplate(dataSource)
 
     fun countMtbAnmeldungInYear(year: Int): Int {
-        val sql = """SELECT DISTINCT pat.id FROM dk_mtb_anmeldung a 
+        val sql = """SELECT DISTINCT CONCAT(pat.id, '-', p.id) FROM dk_mtb_anmeldung a 
             JOIN prozedur p ON (a.id = p.id) 
             JOIN patient pat ON (pat.id = p.patient_id) 
             WHERE p.geloescht <> 1 AND pat.nachname <> 'Momentum' AND YEAR(a.anmeldedatum) = :year""".trimIndent()
@@ -53,14 +53,14 @@ class ZpmDashboardService(dataSource: DataSource?) {
             val params = MapSqlParameterSource().apply {
                 addValue("year", year)
             }
-            return jdbcTemplate.queryForList(sql, params, Int::class.java).size
+            return jdbcTemplate.queryForList(sql, params, String::class.java).size
         } catch (_: Exception) {
             return 0
         }
     }
 
     fun countMtbEmpfehlungInYear(year: Int): Int {
-        val sql = """SELECT DISTINCT pat.id FROM dk_mtb_empfehlung e 
+        val sql = """SELECT DISTINCT CONCAT(pat.id, '-', p.id) FROM dk_mtb_empfehlung e 
             JOIN prozedur p ON (e.id = p.id) 
             JOIN patient pat ON (pat.id = p.patient_id) 
             WHERE p.geloescht <> 1 AND pat.nachname <> 'Momentum' AND YEAR(e.mtbdatum) = :year""".trimMargin()
@@ -68,7 +68,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
             val params = MapSqlParameterSource().apply {
                 addValue("year", year)
             }
-            return jdbcTemplate.queryForList(sql, params, Int::class.java).size
+            return jdbcTemplate.queryForList(sql, params, String::class.java).size
         } catch (_: Exception) {
             return 0
         }
@@ -144,11 +144,11 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 p.beginndatum 
             FROM dk_mtb_anmeldung anm
             JOIN prozedur p ON (anm.id = p.id)
+            JOIN patient pat ON (p.patient_id = pat.id)
             LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
             LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
-            JOIN patient pat ON (p.patient_id = pat.id)
-            WHERE YEAR(beginndatum) = :year AND p.geloescht <> 1 AND pat.nachname <> 'Momentum'
-            ORDER BY beginndatum, pat.patienten_id;
+            WHERE YEAR(anmeldedatum) = :year AND p.geloescht <> 1 AND pat.nachname <> 'Momentum'
+            ORDER BY anmeldedatum, pat.patienten_id;
         """.trimIndent()
 
         val params = MapSqlParameterSource().apply {

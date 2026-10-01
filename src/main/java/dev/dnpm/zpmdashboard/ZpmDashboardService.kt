@@ -179,18 +179,18 @@ class ZpmDashboardService(dataSource: DataSource?) {
             """SELECT DISTINCT 
                 pat.patienten_id, 
                 pat.guid AS pat_guid, 
-                p.guid AS proc_guid, 
+                zpmp.guid AS proc_guid, 
                 e.guid AS e_guid,
-                empf.mtbdatum 
-            FROM dk_mtb_anmeldung a
-            JOIN prozedur p ON (a.id = p.id)
-            JOIN dk_mtb_empfehlung empf ON (empf.anmeldung = a.id)
-            JOIN prozedur empfp ON (empfp.id = empf.id)
-            LEFT JOIN erkrankung_prozedur ep ON (p.id = ep.prozedur_id) 
+                zpm.zaehlzeitpunkt 
+            FROM dk_zpm_auswertungen zpm
+            JOIN prozedur zpmp ON (zpm.id = zpmp.id)
+            JOIN dk_mtb_empfehlung emp ON (emp.mtbdatum = zpm.zaehlzeitpunkt)
+            JOIN prozedur empp ON (empp.id = emp.id)
+            LEFT JOIN erkrankung_prozedur ep ON (zpmp.id = ep.prozedur_id) 
             LEFT JOIN erkrankung e ON (ep.erkrankung_id = e.id)
-            JOIN patient pat ON (p.patient_id = pat.id)
-            WHERE YEAR(empf.mtbdatum) = :year AND p.geloescht <> 1 AND empf.modellvorhaben = 1 AND empfp.patient_id = p.patient_id AND pat.nachname <> 'Momentum'
-            ORDER BY mtbdatum, pat.patienten_id;
+            JOIN patient pat ON (zpmp.patient_id = pat.id)
+            WHERE zpmp.patient_id = empp.patient_id AND YEAR(zaehlzeitpunkt) = :year AND zpmp.geloescht <> 1 AND emp.modellvorhaben = 1 AND pat.nachname <> 'Momentum'
+            ORDER BY zaehlzeitpunkt, pat.patienten_id;
         """.trimIndent()
 
         val params = MapSqlParameterSource().apply {

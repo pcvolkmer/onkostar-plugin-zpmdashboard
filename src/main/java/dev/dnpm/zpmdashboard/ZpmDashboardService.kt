@@ -206,7 +206,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                         rs.getString("pat_guid"),
                         rs.getString("proc_guid"),
                         rs.getString("e_guid").orEmpty(),
-                        rs.getString("mtbdatum")
+                        rs.getString("zaehlzeitpunkt")
                     )
                 )
             }

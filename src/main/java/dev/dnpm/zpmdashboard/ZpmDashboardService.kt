@@ -634,6 +634,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val headers = listOf(
             "Nr",
             "PatID",
+            "H-Nummer",
             "Geburtsdatum",
             "Datum Empfehlung",
             "Entität",
@@ -691,7 +692,11 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 pidCell.setCellValue(case.pid.orEmpty())
                 pidCell.cellStyle = cellStyle
 
-                val geburtsdatumCell = row.createCell(2)
+                val hCell = row.createCell(2)
+                hCell.setCellValue(case.pid.orEmpty())
+                hCell.cellStyle = cellStyle
+
+                val geburtsdatumCell = row.createCell(3)
                 try {
                     val date = LocalDate.parse(case.geburtsdatum.orEmpty())
                     geburtsdatumCell.setCellValue(Date.valueOf(date))
@@ -699,7 +704,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 geburtsdatumCell.cellStyle = dateStyle
 
-                val zZeitpunktCell = row.createCell(3)
+                val zZeitpunktCell = row.createCell(4)
                 try {
                     val date = LocalDate.parse(case.zaehlzeitpunkt.orEmpty())
                     zZeitpunktCell.setCellValue(Date.valueOf(date))
@@ -707,27 +712,27 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 zZeitpunktCell.cellStyle = dateStyle
 
-                val entCell = row.createCell(4)
+                val entCell = row.createCell(5)
                 entCell.setCellValue(case.entitaet.orEmpty())
                 entCell.cellStyle = cellStyle
 
-                val icd10Cell = row.createCell(5)
+                val icd10Cell = row.createCell(6)
                 icd10Cell.setCellValue(case.icd10.orEmpty())
                 icd10Cell.cellStyle = cellStyle
 
-                val dxTextCell = row.createCell(6)
+                val dxTextCell = row.createCell(7)
                 dxTextCell.setCellValue(case.icd10Text.orEmpty())
                 dxTextCell.cellStyle = cellStyle
 
-                val icdO3TCell = row.createCell(7)
+                val icdO3TCell = row.createCell(8)
                 icdO3TCell.setCellValue(case.icdO3T.orEmpty())
                 icdO3TCell.cellStyle = cellStyle
 
-                val icdO3TTextCell = row.createCell(8)
+                val icdO3TTextCell = row.createCell(9)
                 icdO3TTextCell.setCellValue(case.icdO3TText.orEmpty())
                 icdO3TTextCell.cellStyle = cellStyle
 
-                val dxDateCell = row.createCell(9)
+                val dxDateCell = row.createCell(10)
                 try {
                     val date = LocalDate.parse(case.diagnosisDate.orEmpty())
                     dxDateCell.setCellValue(Date.valueOf(date))
@@ -735,7 +740,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 dxDateCell.cellStyle = dateStyle
 
-                val internExternColumn = row.createCell(10)
+                val internExternColumn = row.createCell(11)
                 internExternColumn.setCellValue(
                     if (case.internextern == "E") {
                         "extern"
@@ -745,7 +750,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 internExternColumn.cellStyle = cellStyle
 
-                val studieColumn = row.createCell(11)
+                val studieColumn = row.createCell(12)
                 studieColumn.setCellValue(
                     if (case.studie) {
                         "Ja"
@@ -755,7 +760,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 studieColumn.cellStyle = cellStyle
 
-                val offLabelColumn = row.createCell(12)
+                val offLabelColumn = row.createCell(13)
                 offLabelColumn.setCellValue(
                     if (case.offlabel) {
                         "Ja"
@@ -765,7 +770,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 offLabelColumn.cellStyle = cellStyle
 
-                val consentCell = row.createCell(13)
+                val consentCell = row.createCell(14)
                 try {
                     val date = LocalDate.parse(case.consent.datum.orEmpty())
                     consentCell.setCellValue(Date.valueOf(date))
@@ -773,7 +778,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 consentCell.cellStyle = dateStyle
 
-                val consentAcceptedCell = row.createCell(14)
+                val consentAcceptedCell = row.createCell(15)
                 consentAcceptedCell.setCellValue(
                     if (case.consent.zustimmung) {
                         "Ja"
@@ -783,7 +788,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 consentAcceptedCell.cellStyle = cellStyle
 
-                val todokDateCell = row.createCell(15)
+                val todokDateCell = row.createCell(16)
                 try {
                     val date = LocalDate.parse(case.latestDokuDatum.orEmpty())
                     todokDateCell.setCellValue(Date.valueOf(date))
@@ -791,7 +796,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 }
                 todokDateCell.cellStyle = dateStyle
 
-                val warningCell = row.createCell(16)
+                val warningCell = row.createCell(17)
                 warningCell.setCellValue(
                     if (case.warnings) {
                         "Ja"
@@ -801,7 +806,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 warningCell.cellStyle = cellStyle
 
-                val keinPF = row.createCell(17)
+                val keinPF = row.createCell(18)
                 keinPF.setCellValue(
                     if (case.warningDetails?.invalidPrimaerfall == true) {
                         "Ja"
@@ -811,7 +816,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 keinPF.cellStyle = cellStyle
 
-                val noMolGen = row.createCell(18)
+                val noMolGen = row.createCell(19)
                 noMolGen.setCellValue(
                     if (case.warningDetails?.noMolgen == true) {
                         "Ja"
@@ -821,7 +826,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 )
                 noMolGen.cellStyle = cellStyle
 
-                val noDisease = row.createCell(19)
+                val noDisease = row.createCell(20)
                 noDisease.setCellValue(
                     if (case.warningDetails?.noDisease == true) {
                         "Ja"

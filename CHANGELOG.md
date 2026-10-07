@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.6](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.5...v0.4.6) (2026-10-07)
+
+
+### Features
+
+* mark lost and unknown follow-up states ([86265f2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/86265f2bd6442b81747f4ac67ad1df32dd2166f5))
+
 ## [0.4.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.4...v0.4.5) (2026-10-07)
 
 

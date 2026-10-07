@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import javax.sql.DataSource
 
 
@@ -581,7 +582,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
                 JOIN erkrankung_prozedur all_ep ON (all_ep.erkrankung_id = ep.erkrankung_id)
                 JOIN prozedur p ON (p.id = all_ep.prozedur_id AND p.geloescht <> 1)
                 JOIN patient pat ON (pat.id = p.patient_id)
-                JOIN dk_dnpm_followup fu ON (fu.id = p.id)
+                LEFT JOIN dk_dnpm_followup fu ON (fu.id = p.id)
                 WHERE e.id = :empfehlungs_id
                 ORDER BY fu.datumfollowup DESC
                 LIMIT 1"""
@@ -595,34 +596,31 @@ class ZpmDashboardService(dataSource: DataSource?) {
 
             return jdbcTemplate.queryForObject(sql, params, { row, _ ->
                 if (row.getString("mtbdatum").isNullOrBlank()) {
-                    return@queryForObject FollowUp(null, null, false)
+                    return@queryForObject FollowUp(null, null, FollowUpStatus.UNKNOWN)
                 }
 
-                if (row.getString("datumfollowup").isNullOrBlank()) {
-                    val vorgesehen = LocalDate.parse(row.getString("mtbdatum"), dateTimeFormatter)
-                        .plusMonths(3)
-                        .format(dateTimeFormatter)
-                    return@queryForObject FollowUp(null, vorgesehen, true)
-                }
-                val date = LocalDate.parse(row.getString("datumfollowup"), dateTimeFormatter)
-                val lost = row.getBoolean("losttofollowup") || !row.getString("sterbedatum").isNullOrBlank()
-                val due = !lost && date.isBefore(
-                    LocalDate.now().minusMonths(3)
-                )
-
-                val vorgesehen = if (due) {
-                    LocalDate.parse(row.getString("datumfollowup"), dateTimeFormatter)
-                        .plusMonths(3)
-                        .format(dateTimeFormatter)
+                val letztesDatum = if (row.getString("datumfollowup").isNullOrBlank()) {
+                    LocalDate.parse(row.getString("mtbdatum"), dateTimeFormatter)
                 } else {
-                    null
+                    LocalDate.parse(row.getString("datumfollowup"), dateTimeFormatter)
                 }
+                val vorgesehen = letztesDatum.plusMonths(3).format(dateTimeFormatter)
+                val lost = row.getBoolean("losttofollowup") || !row.getString("sterbedatum").isNullOrBlank()
 
-                FollowUp(row.getString("datumfollowup"), vorgesehen, due)
+                return@queryForObject if (!lost) {
+                    FollowUp(
+                        letztesDatum.format(dateTimeFormatter),
+                        vorgesehen,
+                        FollowUpStatus.fromDatumVorgesehen(vorgesehen)
+                    )
+                } else {
+                    FollowUp(letztesDatum.format(dateTimeFormatter), null, FollowUpStatus.LOST)
+                }
             })
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            e.printStackTrace()
             // Nicht feststellbar
-            return FollowUp(null, null, false)
+            return FollowUp(null, null, FollowUpStatus.UNKNOWN)
         }
     }
 
@@ -1084,6 +1082,40 @@ class ZpmDashboardService(dataSource: DataSource?) {
     data class FollowUp(
         val datum: String?,
         val datumVorgesehen: String?,
-        val erforderlich: Boolean = false
+        val status: FollowUpStatus = FollowUpStatus.UNKNOWN
     )
+
+    enum class FollowUpStatus(val value: String) {
+        OK("ok"),
+        DUE("due"),
+        OVERDUE("overdue"),
+        LOST("lost"),
+        UNKNOWN("unknown");
+
+        companion object {
+            fun fromDatumVorgesehen(datumVorgesehen: String?): FollowUpStatus {
+                val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+                if (datumVorgesehen.isNullOrEmpty()) {
+                    return UNKNOWN
+                }
+
+                try {
+                    val date = LocalDate.parse(datumVorgesehen, dateTimeFormatter)
+
+                    if (date.isBefore(LocalDate.now().minusWeeks(2))) {
+                        return OVERDUE
+                    }
+
+                    if (date.isBefore(LocalDate.now().plusWeeks(2))) {
+                        return DUE
+                    }
+
+                    return OK
+                } catch (_: DateTimeParseException) {
+                    return UNKNOWN
+                }
+            }
+        }
+    }
 }

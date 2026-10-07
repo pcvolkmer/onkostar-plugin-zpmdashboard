@@ -76,7 +76,7 @@
 }
 
 .dashboard-entry .details > .follow-up {
-    @apply bg-red-600;
+    @apply bg-gray-600;
 }
 
 .dashboard-entry .details > .success {
@@ -85,6 +85,10 @@
 
 .dashboard-entry .details > .warning {
     @apply bg-yellow-600;
+}
+
+.dashboard-entry .details > .error {
+    @apply bg-red-600;
 }
 
 .dashboard-entry .name {

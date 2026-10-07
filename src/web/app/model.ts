@@ -84,12 +84,6 @@ export class CaseModel {
   }
 }
 
-export enum FollowUpState {
-    NO_FOLLOW_UP,
-    FOLLOW_UP_PENDING,
-    FOLLOW_UP_OK,
-}
-
 export class Consent {
     public datum: string | null;
     public zustimmung: boolean;
@@ -147,13 +141,21 @@ export class Aufgabe {
 export class FollowUp {
   public datum: string | null;
   public datumVorgesehen: string | null;
-  public erforderlich: boolean;
+  public status: FollowUpStatus;
 
   constructor() {
     this.datum = null;
     this.datumVorgesehen = null;
-    this.erforderlich = false;
+    this.status = FollowUpStatus.UNKNOWN;
   }
+}
+
+export enum FollowUpStatus {
+  OK = "OK",
+  DUE = "DUE" ,
+  OVERDUE = "OVERDUE",
+  LOST = "LOST",
+  UNKNOWN = "UNKNOWN"
 }
 
 export enum Context {

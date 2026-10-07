@@ -156,21 +156,25 @@
                     }
                 </div>
                 <div
-                        [class.success]="data().followUp?.status === FollowUpStatus.OK"
+                        [class.success]="data().followUp?.status === FollowUpStatus.OK || data().followUp?.status === FollowUpStatus.LOST"
                         [class.warning]="data().followUp?.status === FollowUpStatus.DUE"
                         [class.error]="data().followUp?.status === FollowUpStatus.OVERDUE"
                         [class.due-followup]="data().followUp?.status === FollowUpStatus.DUE || data().followUp?.status === FollowUpStatus.OVERDUE"
                         class="follow-up">
-                    <div class="name">Follow-Ups {{data().followUp?.status}}</div>
+                    <div class="name">Follow-Ups</div>
                     @if (data().followUp?.datum) {
                         <div>Zuletzt: {{ data().followUp?.datum | date: 'dd.MM.yyyy'}}</div>
                     } @else {
                         <div>Nicht dokumentiert</div>
                     }
-                    @if (data().followUp?.datumVorgesehen) {
-                        <div>Vorgesehen: {{ data().followUp?.datumVorgesehen | date: 'dd.MM.yyyy'}}</div>
+                    @if (data().followUp?.status !== FollowUpStatus.UNKNOWN) {
+                        @if (data().followUp?.datumVorgesehen) {
+                            <div>Vorgesehen: {{ data().followUp?.datumVorgesehen | date: 'dd.MM.yyyy'}}</div>
+                        } @else {
+                            <div>Nicht (mehr) vorgesehen</div>
+                        }
                     } @else {
-                        <div>Nicht (mehr) vorgesehen</div>
+                        <div>Keine Angaben</div>
                     }
                 </div>
             </div>

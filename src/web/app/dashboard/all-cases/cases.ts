@@ -18,9 +18,9 @@
  *
  */
 
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DashboardEntry} from "../../dashboard-entry/dashboard-entry";
-import {CaseId, Context, StatisticsModel} from "../../model";
+import {Context, StatisticsModel} from "../../model";
 import {OnkostarService} from "../../onkostar.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AbstractCasesComponent} from "../cases";
@@ -48,6 +48,7 @@ export class AllCasesComponent extends AbstractCasesComponent implements OnInit 
         this.offlabelCount = 0;
         this.studyCount = 0;
         this.taskCount = 0;
+        this.dueFollowUpCount = 0;
 
         this.exportMarkedCases = [];
 

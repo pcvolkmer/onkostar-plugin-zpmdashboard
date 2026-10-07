@@ -57,7 +57,7 @@ export class CaseModel {
   public warnings: boolean;
   public warningDetails: WarningDetails;
   public aufgaben: Aufgabe[];
-  public latestFollowUp: string | null;
+  public followUp: FollowUp | null;
 
   constructor() {
     this.pid = "";
@@ -80,7 +80,7 @@ export class CaseModel {
     this.warnings = false;
     this.warningDetails = new WarningDetails();
     this.aufgaben = [];
-    this.latestFollowUp = null;
+    this.followUp = null;
   }
 }
 
@@ -141,6 +141,18 @@ export class Aufgabe {
     this.formGuid = null;
     this.text = "";
     this.dueDate = null;
+  }
+}
+
+export class FollowUp {
+  public datum: string | null;
+  public datumVorgesehen: string | null;
+  public erforderlich: boolean;
+
+  constructor() {
+    this.datum = null;
+    this.datumVorgesehen = null;
+    this.erforderlich = false;
   }
 }
 

@@ -24,7 +24,6 @@ import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -575,26 +574,56 @@ class ZpmDashboardService(dataSource: DataSource?) {
         return emptyList()
     }
 
-    fun hasRelatedFollowUp(empfehlungsId: Int): String? {
+    fun hasRelatedFollowUp(empfehlungsId: Int): FollowUp {
         val sql =
-            """SELECT MAX(p.beginndatum) AS count FROM dk_mtb_empfehlung e
+            """SELECT fu.datumfollowup, fu.losttofollowup, pat.sterbedatum, e.mtbdatum FROM dk_mtb_empfehlung e
                 JOIN erkrankung_prozedur ep ON (ep.prozedur_id = e.id)
                 JOIN erkrankung_prozedur all_ep ON (all_ep.erkrankung_id = ep.erkrankung_id)
                 JOIN prozedur p ON (p.id = all_ep.prozedur_id AND p.geloescht <> 1)
+                JOIN patient pat ON (pat.id = p.patient_id)
                 JOIN dk_dnpm_followup fu ON (fu.id = p.id)
-                WHERE e.mtbdatum < p.beginndatum AND e.id = :empfehlungs_id"""
+                WHERE e.id = :empfehlungs_id
+                ORDER BY fu.datumfollowup DESC
+                LIMIT 1"""
+
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
         try {
             val params = MapSqlParameterSource().apply {
                 addValue("empfehlungs_id", empfehlungsId)
             }
 
-            return jdbcTemplate.queryForObject(sql, params, String::class.java)
-        } catch (_: Exception) {
-            // Nop
-        }
+            return jdbcTemplate.queryForObject(sql, params, { row, _ ->
+                if (row.getString("mtbdatum").isNullOrBlank()) {
+                    return@queryForObject FollowUp(null, null, false)
+                }
 
-        return null
+                if (row.getString("datumfollowup").isNullOrBlank()) {
+                    val vorgesehen = LocalDate.parse(row.getString("mtbdatum"), dateTimeFormatter)
+                        .plusMonths(3)
+                        .format(dateTimeFormatter)
+                    return@queryForObject FollowUp(null, vorgesehen, true)
+                }
+                val date = LocalDate.parse(row.getString("datumfollowup"), dateTimeFormatter)
+                val lost = row.getBoolean("losttofollowup") || !row.getString("sterbedatum").isNullOrBlank()
+                val due = !lost && date.isBefore(
+                    LocalDate.now().minusMonths(3)
+                )
+
+                val vorgesehen = if (due) {
+                    LocalDate.parse(row.getString("datumfollowup"), dateTimeFormatter)
+                        .plusMonths(3)
+                        .format(dateTimeFormatter)
+                } else {
+                    null
+                }
+
+                FollowUp(row.getString("datumfollowup"), vorgesehen, due)
+            })
+        } catch (_: Exception) {
+            // Nicht feststellbar
+            return FollowUp(null, null, false)
+        }
     }
 
     fun casesXsl(year: Int, context: String, pid: List<String>): ByteArray {
@@ -945,7 +974,26 @@ class ZpmDashboardService(dataSource: DataSource?) {
             "Haut" to listOf("C43", "C44"),
             "Prostata" to listOf("C61"),
             "Pankreas" to listOf("C25"),
-            "Kopf-Hals-Tumoren" to listOf("C00", "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14", "C30", "C31", "C32"),
+            "Kopf-Hals-Tumoren" to listOf(
+                "C00",
+                "C01",
+                "C02",
+                "C03",
+                "C04",
+                "C05",
+                "C06",
+                "C07",
+                "C08",
+                "C09",
+                "C10",
+                "C11",
+                "C12",
+                "C13",
+                "C14",
+                "C30",
+                "C31",
+                "C32"
+            ),
             "Neuroonkologische Tumoren" to listOf("C70", "C71", "C72"),
             "Magen" to listOf("C16"),
             "Speiseröhre" to listOf("C15"),
@@ -1004,7 +1052,7 @@ class ZpmDashboardService(dataSource: DataSource?) {
         var warnings: Boolean = false,
         var warningDetails: WarningDetails? = null,
         val aufgaben: List<Aufgabe> = emptyList(),
-        val latestFollowUp: String? = null
+        val followUp: FollowUp? = null
     )
 
     data class Consent(
@@ -1031,5 +1079,11 @@ class ZpmDashboardService(dataSource: DataSource?) {
         val formName: String?,
         val formDate: String?,
         val formGuid: String?
+    )
+
+    data class FollowUp(
+        val datum: String?,
+        val datumVorgesehen: String?,
+        val erforderlich: Boolean = false
     )
 }

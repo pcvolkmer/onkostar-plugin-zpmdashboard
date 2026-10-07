@@ -94,7 +94,15 @@
                 </span>
                 <span class="value">{{taskCount}}</span>
             </li>
-            <li class="empty"></li>
+            <li class="warnings" [class.zerovalue]="dueFollowUpCount === 0">
+                <span class="name">Ausstehende FollowUps
+                    @if (dueFollowUpCount > 0) {
+                        &nbsp;-&nbsp;
+                        <label class="filter" title="Danach filtern"><input (change)="switchDueFollowUps()" class="filter" type="checkbox" [checked]="hideNoneDueFollowUps" />&nbsp;Danach filtern</label>
+                    }
+                </span>
+                <span class="value">{{dueFollowUpCount}}</span>
+            </li>
         </ul>
     </div>
     <h2>
@@ -131,6 +139,7 @@
                                 (studyCountChange)="updateStudyCount()"
                                 (taskCountChange)="updateTaskCount()"
                                 (entitaetChange)="updateEntitaetCounts($event)"
+                                (dueFollowUpChanged)="updateDueFollowUp()"
                                 (exportMarkChanged)="onExportMarkChanged($event)"
                                 [pid]="caseId.pid"
                                 [patientGuid]="caseId.patientGuid"

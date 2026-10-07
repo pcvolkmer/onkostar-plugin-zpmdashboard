@@ -156,14 +156,20 @@
                     }
                 </div>
                 <div
-                        [class.success]="followUpState === FollowUpState.FOLLOW_UP_OK"
-                        [class.warning]="followUpState === FollowUpState.FOLLOW_UP_PENDING"
+                        [class.success]="data().followUp?.erforderlich !== true"
+                        [class.warning]="data().followUp?.erforderlich === true"
+                        [class.due-followup]="data().followUp?.erforderlich === true"
                         class="follow-up">
                     <div class="name">Follow-Ups</div>
-                    @if (data().latestFollowUp) {
-                        <div>Zuletzt: {{ data().latestFollowUp | date: 'dd.MM.yyyy'}}</div>
+                    @if (data().followUp?.datum) {
+                        <div>Zuletzt: {{ data().followUp?.datum | date: 'dd.MM.yyyy'}}</div>
                     } @else {
                         <div>Nicht dokumentiert</div>
+                    }
+                    @if (data().followUp?.datumVorgesehen) {
+                        <div>Vorgesehen: {{ data().followUp?.datumVorgesehen | date: 'dd.MM.yyyy'}}</div>
+                    } @else {
+                        <div>Nicht (mehr) vorgesehen</div>
                     }
                 </div>
             </div>

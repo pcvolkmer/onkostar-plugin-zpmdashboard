@@ -39,10 +39,12 @@ export abstract class AbstractCasesComponent implements OnInit {
     protected studyCount = 0;
     protected taskCount = 0;
     protected entitaetCounts = new Map<string, number>;
+    protected dueFollowUpCount = 0;
 
     protected hideNoneWarnings = false;
     protected hideNonePFWarnings = false;
     protected hideNoneTasks = false;
+    protected hideNoneDueFollowUps = false;
 
     protected exportMarkedCases = new Array<string>();
 
@@ -133,6 +135,10 @@ export abstract class AbstractCasesComponent implements OnInit {
         }
     }
 
+    protected updateDueFollowUp() {
+        this.dueFollowUpCount++;
+    }
+
     protected entitaetenChartData(): Array<any> {
         const sortedMap = new Map(
             [...this.entitaetCounts.entries()].sort(([, a], [, b]) => b - a)
@@ -162,6 +168,7 @@ export abstract class AbstractCasesComponent implements OnInit {
         this.hideNoneWarnings = !this.hideNoneWarnings;
         this.hideNonePFWarnings = false;
         this.hideNoneTasks = false;
+        this.hideNoneDueFollowUps = false;
         if (this.hideNoneWarnings) {
             document.querySelectorAll('.dashboard-entry').forEach(elem => {
                 (elem as HTMLElement).style.display = 'none';
@@ -180,6 +187,7 @@ export abstract class AbstractCasesComponent implements OnInit {
         this.hideNonePFWarnings = !this.hideNonePFWarnings;
         this.hideNoneWarnings = false;
         this.hideNoneTasks = false;
+        this.hideNoneDueFollowUps = false;
         if (this.hideNonePFWarnings) {
             document.querySelectorAll('.dashboard-entry').forEach(elem => {
                 (elem as HTMLElement).style.display = 'none';
@@ -198,11 +206,31 @@ export abstract class AbstractCasesComponent implements OnInit {
         this.hideNoneTasks = !this.hideNoneTasks;
         this.hideNonePFWarnings = false;
         this.hideNoneWarnings = false;
+        this.hideNoneDueFollowUps = false;
         if (this.hideNoneTasks) {
             document.querySelectorAll('.dashboard-entry').forEach(elem => {
                 (elem as HTMLElement).style.display = 'none';
             });
             document.querySelectorAll('.dashboard-entry:has(.check-tasks)').forEach(elem => {
+                (elem as HTMLElement).style.display = '';
+            });
+            return;
+        }
+        document.querySelectorAll('.dashboard-entry').forEach(elem => {
+            (elem as HTMLElement).style.display = '';
+        });
+    }
+
+    protected switchDueFollowUps() {
+        this.hideNoneDueFollowUps = !this.hideNoneDueFollowUps;
+        this.hideNoneTasks = false;
+        this.hideNonePFWarnings = false;
+        this.hideNoneWarnings = false;
+        if (this.hideNoneDueFollowUps) {
+            document.querySelectorAll('.dashboard-entry').forEach(elem => {
+                (elem as HTMLElement).style.display = 'none';
+            });
+            document.querySelectorAll('.dashboard-entry:has(.due-followup)').forEach(elem => {
                 (elem as HTMLElement).style.display = '';
             });
             return;

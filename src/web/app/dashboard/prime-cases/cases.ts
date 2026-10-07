@@ -49,6 +49,7 @@ export class PrimeCasesComponent extends AbstractCasesComponent implements OnIni
         this.offlabelCount = 0;
         this.studyCount = 0;
         this.taskCount = 0;
+        this.dueFollowUpCount = 0;
 
         this.exportMarkedCases = [];
 

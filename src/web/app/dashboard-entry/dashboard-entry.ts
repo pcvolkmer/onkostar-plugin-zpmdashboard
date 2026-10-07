@@ -31,6 +31,7 @@ export class DashboardEntry implements OnInit {
   public taskCountChange = output();
   public entitaetChange = output<string | null>();
   public exportMarkChanged = output<{pid: string, checked: boolean}>();
+  public dueFollowUpChanged = output();
 
   protected readonly FollowUpState = FollowUpState;
 
@@ -72,21 +73,10 @@ export class DashboardEntry implements OnInit {
         this.taskCountChange.emit();
       }
       this.entitaetChange.emit(res.entitaet);
+      if (res.followUp?.erforderlich) {
+        this.dueFollowUpChanged.emit();
+      }
     });
-  }
-
-  get followUpState(): FollowUpState {
-    let latestFollowUp = this.data().latestFollowUp;
-    if (latestFollowUp == null) {
-      return FollowUpState.NO_FOLLOW_UP;
-    }
-    const dueDate = new Date();
-    dueDate.setMonth(dueDate.getMonth() -3);
-    const followUpDate = new Date(latestFollowUp);
-    if (followUpDate < dueDate) {
-      return FollowUpState.FOLLOW_UP_PENDING;
-    }
-    return FollowUpState.FOLLOW_UP_OK;
   }
 
   protected onExportMarkChanged(e: Event) {

@@ -156,11 +156,12 @@
                     }
                 </div>
                 <div
-                        [class.success]="data().followUp?.erforderlich !== true"
-                        [class.warning]="data().followUp?.erforderlich === true"
-                        [class.due-followup]="data().followUp?.erforderlich === true"
+                        [class.success]="data().followUp?.status === FollowUpStatus.OK"
+                        [class.warning]="data().followUp?.status === FollowUpStatus.DUE"
+                        [class.error]="data().followUp?.status === FollowUpStatus.OVERDUE"
+                        [class.due-followup]="data().followUp?.status === FollowUpStatus.DUE || data().followUp?.status === FollowUpStatus.OVERDUE"
                         class="follow-up">
-                    <div class="name">Follow-Ups</div>
+                    <div class="name">Follow-Ups {{data().followUp?.status}}</div>
                     @if (data().followUp?.datum) {
                         <div>Zuletzt: {{ data().followUp?.datum | date: 'dd.MM.yyyy'}}</div>
                     } @else {

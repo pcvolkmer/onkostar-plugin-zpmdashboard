@@ -7,6 +7,7 @@ import {
   HttpResponse
 } from '@angular/common/http';
 import {delay, Observable, of} from 'rxjs';
+import {FollowUpStatus} from "./app/model";
 
 @Injectable()
 export class MockBackendInterceptor implements HttpInterceptor {
@@ -82,7 +83,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
               followUp: {
                   datum: "2026-06-01",
                   datumVorgesehen: parseInt(guid[1]) % 2 == 1 ? "2025-10-01" : null,
-                  erforderlich: parseInt(guid[1]) % 2 == 1,
+                  status: parseInt(guid[1]) % 2 == 1 ? FollowUpStatus.OVERDUE : FollowUpStatus.LOST,
               }
       };
 

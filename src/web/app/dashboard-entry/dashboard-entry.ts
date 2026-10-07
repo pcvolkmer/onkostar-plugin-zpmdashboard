@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, output, signal} from '@angular/core';
-import {CaseModel, Context, FollowUpState} from "../model";
+import {CaseModel, Context, FollowUpStatus} from "../model";
 import {OnkostarService} from "../onkostar.service";
 import {DatePipe} from "@angular/common";
 
@@ -32,8 +32,6 @@ export class DashboardEntry implements OnInit {
   public entitaetChange = output<string | null>();
   public exportMarkChanged = output<{pid: string, checked: boolean}>();
   public dueFollowUpChanged = output();
-
-  protected readonly FollowUpState = FollowUpState;
 
   constructor(readonly onkostarService: OnkostarService) {
     this.onkostarService = onkostarService;
@@ -73,7 +71,7 @@ export class DashboardEntry implements OnInit {
         this.taskCountChange.emit();
       }
       this.entitaetChange.emit(res.entitaet);
-      if (res.followUp?.erforderlich) {
+      if (res.followUp?.status == FollowUpStatus.DUE || res.followUp?.status == FollowUpStatus.OVERDUE) {
         this.dueFollowUpChanged.emit();
       }
     });
@@ -83,4 +81,6 @@ export class DashboardEntry implements OnInit {
     const checked = (e.target as HTMLInputElement).checked;
     this.exportMarkChanged.emit({pid: this.pid, checked});
   }
+
+  protected readonly FollowUpStatus = FollowUpStatus;
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.5](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.4...v0.4.5) (2026-10-07)
+
+
+### Features
+
+* add follow-up check ([#103](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/103)) ([d65079f](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/d65079f6c5c991f241e69033c501d172f2ea1a78))
+* add follow-up status ([#104](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/104)) ([69994e2](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/69994e2fed5f41c498dc84248f7259d3ea334e04))
+* export Einsendenummer/H-Nummer ([#101](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/issues/101)) ([208b1cc](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/commit/208b1ccf6b6f49c0e14f34ad1eb4b8c3040de203))
+
 ## [0.4.4](https://github.com/pcvolkmer/onkostar-plugin-zpmdashboard/compare/v0.4.3...v0.4.4) (2026-10-01)
 
 
